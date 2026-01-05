@@ -1,0 +1,1429 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maherco.Challenges</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #000;
+            color: #fff;
+            overflow-x: hidden;
+            position: relative;
+            min-height: 100vh;
+        }
+
+        /* النقاط اللامعة المتحركة */
+        .sparkle {
+            position: fixed;
+            border-radius: 50%;
+            background: #FFD700;
+            box-shadow: 0 0 10px #FFD700;
+            animation: pulse 2s infinite;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        .container {
+            position: relative;
+            z-index: 10;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+        }
+
+        .title {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #FFD700;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            color: #000;
+        }
+
+        .btn-back {
+            background: #F59E0B;
+            color: #fff;
+        }
+
+        .btn-logout {
+            background: #EF4444;
+            color: #fff;
+        }
+
+        .btn-success {
+            background: #10B981;
+            color: #fff;
+        }
+
+        .btn-danger {
+            background: #EF4444;
+            color: #fff;
+        }
+
+        .btn-info {
+            background: #3B82F6;
+            color: #fff;
+        }
+
+        /* Login Page */
+        .login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .login-box {
+            background: rgba(31, 41, 55, 0.9);
+            padding: 40px;
+            border-radius: 30px;
+            border: 2px solid #FFD700;
+            box-shadow: 0 0 40px rgba(255, 215, 0, 0.3);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .input {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 2px solid #FFD700;
+            border-radius: 15px;
+            background: #1F2937;
+            color: #fff;
+            font-size: 1rem;
+        }
+
+        /* Home Menu */
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .menu-item {
+            aspect-ratio: 1;
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.6);
+            border: none;
+            color: #000;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .menu-item:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 50px rgba(255, 215, 0, 0.8);
+        }
+
+        .menu-item svg {
+            width: 60px;
+            height: 60px;
+            margin-bottom: 15px;
+        }
+
+        /* Wheel */
+        .wheel-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
+        }
+
+        .wheel-wrapper {
+            position: relative;
+            width: 400px;
+            height: 400px;
+        }
+
+        #wheel {
+            width: 100%;
+            height: 100%;
+            transition: transform 3s cubic-bezier(0.17, 0.67, 0.12, 0.99);
+            cursor: pointer;
+        }
+
+        .wheel-pointer {
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 15px solid transparent;
+            border-right: 15px solid transparent;
+            border-top: 20px solid #EF4444;
+            z-index: 10;
+        }
+
+        .wheel-info {
+            text-align: center;
+            font-size: 1.5rem;
+            color: #FFD700;
+        }
+
+        /* Cards & Lists */
+        .card {
+            background: rgba(31, 41, 55, 0.9);
+            padding: 25px;
+            border-radius: 20px;
+            border: 2px solid #FFD700;
+            margin-bottom: 20px;
+        }
+
+        .card-title {
+            font-size: 1.8rem;
+            color: #FFD700;
+            margin-bottom: 15px;
+        }
+
+        .list-item {
+            background: rgba(55, 65, 81, 0.9);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid #FFD700;
+        }
+
+        .player-rank {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-left: 20px;
+        }
+
+        .rank-1 { color: #FFD700; }
+        .rank-2 { color: #C0C0C0; }
+        .rank-3 { color: #CD7F32; }
+
+        /* Settings Grid */
+        .settings-grid {
+            display: grid;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .settings-btn {
+            background: rgba(31, 41, 55, 0.9);
+            border: 2px solid #FFD700;
+            padding: 20px;
+            border-radius: 15px;
+            color: #fff;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .settings-btn:hover {
+            background: rgba(55, 65, 81, 0.9);
+            transform: translateX(-5px);
+        }
+
+        /* Form Groups */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #FFD700;
+            font-weight: bold;
+        }
+
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #FFD700;
+            border-radius: 10px;
+            background: #1F2937;
+            color: #fff;
+            font-size: 1rem;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #FFD700;
+            border-radius: 10px;
+            background: #1F2937;
+            color: #fff;
+            font-size: 1rem;
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-group .btn {
+            flex: 1;
+        }
+
+        /* Hidden */
+        .hidden {
+            display: none !important;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .title {
+                font-size: 1.8rem;
+            }
+
+            .wheel-wrapper {
+                width: 300px;
+                height: 300px;
+            }
+
+            .menu-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            border: 3px solid rgba(255, 215, 0, 0.3);
+            border-top: 3px solid #FFD700;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .text-gray {
+            color: #9CA3AF;
+        }
+
+        .text-sm {
+            font-size: 0.875rem;
+        }
+
+        .mt-4 {
+            margin-top: 1rem;
+        }
+
+        .mb-4 {
+            margin-bottom: 1rem;
+        }
+
+        .flex {
+            display: flex;
+        }
+
+        .items-center {
+            align-items: center;
+        }
+
+        .justify-between {
+            justify-content: space-between;
+        }
+
+        .gap-4 {
+            gap: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div id="app"></div>
+
+    <script>
+        // البيانات الأساسية
+        const appData = {
+            currentUser: null,
+            currentPage: 'login',
+            pageHistory: [],
+            siteName:'maherco',
+            games: ['Cs2'],
+            players: [
+                { id: 1, name: 'Maherco', points: 0, challenges: 0, cards: 0, instagram: '' }
+            ],
+            cards: ['2X'],
+            users: [
+                { id: 1, username: 'Sally', password: '013799', type: 'admin', createdAt: new Date().toISOString() }
+            ],
+            currentChallenges: [],
+            savedChallenges: [],
+            notes: [],
+            wheelStep: 'games',
+            selectedGame: null,
+            currentChallenge: null,
+            availablePlayers: [],
+            availableCards: [],
+            rotation: 0,
+            isSpinning: false,
+            selectedPlayer: null
+        };
+
+        // النقاط اللامعة
+        function createSparkles() {
+            setInterval(() => {
+                if (Math.random() > 0.7) {
+                    const sparkle = document.createElement('div');
+                    sparkle.className = 'sparkle';
+                    sparkle.style.left = Math.random() * 100 + '%';
+                    sparkle.style.top = Math.random() * 100 + '%';
+                    sparkle.style.width = (Math.random() * 3 + 2) + 'px';
+                    sparkle.style.height = sparkle.style.width;
+                    document.body.appendChild(sparkle);
+                    
+                    setTimeout(() => sparkle.remove(), 3000);
+                }
+            }, 200);
+        }
+
+        // التنقل بين الصفحات
+        function navigateTo(page) {
+            appData.pageHistory.push(appData.currentPage);
+            appData.currentPage = page;
+            render();
+        }
+
+        function goBack() {
+            if (appData.pageHistory.length > 0) {
+                appData.currentPage = appData.pageHistory.pop();
+                render();
+            }
+        }
+
+        function logout() {
+            appData.currentUser = null;
+            appData.currentPage = 'login';
+            appData.pageHistory = [];
+            render();
+        }
+
+        // صفحة تسجيل الدخول
+        function renderLogin() {
+            return `
+                <div class="login-container">
+                    <div class="login-box">
+                        <h1 class="title text-center mb-4">${appData.siteName}</h1>
+                        <input type="text" id="username" class="input" placeholder="اسم المستخدم">
+                        <input type="password" id="password" class="input" placeholder="كلمة المرور">
+                        <button class="btn btn-primary" style="width: 100%;" onclick="handleLogin()">تسجيل الدخول</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function handleLogin() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const user = appData.users.find(u => u.username === username && u.password === password);
+            
+            if (user) {
+                appData.currentUser = user;
+                appData.currentPage = 'home';
+                render();
+            } else {
+                alert('خطأ في اسم المستخدم أو كلمة المرور');
+            }
+        }
+
+        // الصفحة الرئيسية
+        function renderHome() {
+            const menuItems = [
+                { icon: '🎡', label: 'دولاب الحظ', page: 'wheel', allowed: ['admin'] },
+                { icon: '🎯', label: 'التحديات الحالية', page: 'current', allowed: ['admin', 'player', 'guest'] },
+                { icon: '📕', label: 'التحديات المحفوظة', page: 'saved', allowed: ['admin', 'player'] },
+                { icon: '🏆', label: 'ترتيب اللاعبين', page: 'ranking', allowed: ['admin', 'player', 'guest'] },
+                { icon: '⚙️', label: 'الإعدادات', page: 'settings', allowed: ['admin'] },
+                { icon: '📝', label: 'الملاحظات', page: 'notes', allowed: ['admin', 'player'] }
+            ];
+
+            const filteredItems = menuItems.filter(item => item.allowed.includes(appData.currentUser.type));
+
+            return `
+                <div class="container">
+                    <div class="header">
+                        <h1 class="title">${appData.siteName}</h1>
+                        <button class="btn btn-logout" onclick="logout()">تسجيل الخروج</button>
+                    </div>
+                    <div class="menu-grid">
+                        ${filteredItems.map(item => `
+                            <button class="menu-item" onclick="navigateTo('${item.page}')">
+                                <div style="font-size: 3rem;">${item.icon}</div>
+                                <span>${item.label}</span>
+                            </button>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        // دولاب الحظ
+        function renderWheel() {
+            let items = [];
+            if (appData.wheelStep === 'games') items = appData.games;
+            else if (appData.wheelStep === 'players') items = appData.availablePlayers.map(p => p.name);
+            else if (appData.wheelStep === 'cards') items = appData.availableCards;
+
+            const colors = ['#EF4444', '#3B82F6', '#EAB308', '#22C55E'];
+            const segmentAngle = 360 / items.length;
+
+            let svg = `<svg viewBox="0 0 200 200" id="wheel">`;
+            
+            items.forEach((item, index) => {
+                const startAngle = index * segmentAngle - 90;
+                const endAngle = startAngle + segmentAngle;
+                const largeArcFlag = segmentAngle > 180 ? 1 : 0;
+                
+                const x1 = 100 + 100 * Math.cos(startAngle * Math.PI / 180);
+                const y1 = 100 + 100 * Math.sin(startAngle * Math.PI / 180);
+                const x2 = 100 + 100 * Math.cos(endAngle * Math.PI / 180);
+                const y2 = 100 + 100 * Math.sin(endAngle * Math.PI / 180);
+                
+                const textAngle = startAngle + segmentAngle / 2;
+                const textX = 100 + 60 * Math.cos(textAngle * Math.PI / 180);
+                const textY = 100 + 60 * Math.sin(textAngle * Math.PI / 180);
+                
+                svg += `
+                    <path d="M 100 100 L ${x1} ${y1} A 100 100 0 ${largeArcFlag} 1 ${x2} ${y2} Z"
+                          fill="${colors[index % colors.length]}"
+                          stroke="#000"
+                          stroke-width="2"/>
+                    <text x="${textX}" y="${textY}"
+                          fill="white"
+                          font-size="10"
+                          font-weight="bold"
+                          text-anchor="middle"
+                          dominant-baseline="middle"
+                          transform="rotate(${textAngle + 90}, ${textX}, ${textY})">
+                        ${item}
+                    </text>
+                `;
+            });
+            
+            svg += `<circle cx="100" cy="100" r="20" fill="white"/></svg>`;
+
+            let stepText = '';
+            if (appData.wheelStep === 'games') stepText = 'اختيار اللعبة';
+            else if (appData.wheelStep === 'players') stepText = `اللعبة: ${appData.selectedGame} - اختيار اللاعب`;
+            else if (appData.wheelStep === 'cards') stepText = `اللاعب: ${appData.currentChallenge?.currentPlayer?.name} - اختيار البطاقة`;
+
+            let currentPlayers = '';
+            if (appData.currentChallenge && appData.currentChallenge.players && appData.currentChallenge.players.length > 0) {
+                currentPlayers = `
+                    <div class="card mt-4" style="max-width: 600px; margin: 0 auto;">
+                        <h3 class="card-title">اللاعبون الحاليون:</h3>
+                        ${appData.currentChallenge.players.map(p => `
+                            <div class="list-item">
+                                <span>${p.player.name}</span>
+                                <span style="color: #FFD700;">${p.card}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            }
+
+            return `
+                <div class="container">
+                    <div class="header">
+                        <button class="btn btn-back" onclick="goBack()">← رجوع</button>
+                        <h2 class="title">دولاب الحظ العشوائي</h2>
+                        <div></div>
+                    </div>
+                    <div class="wheel-container">
+                        <p class="wheel-info">${stepText}</p>
+                        <p style="color: #FCD34D; font-size: 1.2rem;">انقر لتدوير العجلة</p>
+                        <div class="wheel-wrapper">
+                            <div class="wheel-pointer"></div>
+                            ${svg}
+                        </div>
+                        <button class="btn btn-success" style="font-size: 1.2rem; padding: 15px 40px;" onclick="startNewChallenge()">
+                            بدء تحدي جديد
+                        </button>
+                        ${currentPlayers}
+                    </div>
+                </div>
+            `;
+        }
+
+        function startNewChallenge() {
+            appData.wheelStep = 'games';
+            appData.selectedGame = null;
+            appData.currentChallenge = null;
+            appData.availablePlayers = [...appData.players];
+            appData.availableCards = [...appData.cards];
+            appData.rotation = 0;
+            render();
+        }
+
+        function spinWheel() {
+            if (appData.isSpinning) return;
+            
+            appData.isSpinning = true;
+            const spins = 5 + Math.random() * 5;
+            appData.rotation += 360 * spins + Math.random() * 360;
+            
+            const wheel = document.getElementById('wheel');
+            wheel.style.transform = `rotate(${appData.rotation}deg)`;
+            
+            setTimeout(() => {
+                appData.isSpinning = false;
+                handleWheelResult();
+            }, 3000);
+        }
+
+        function handleWheelResult() {
+            const normalizedRotation = appData.rotation % 360;
+            
+            if (appData.wheelStep === 'games') {
+                const segmentAngle = 360 / appData.games.length;
+                const selectedIndex = Math.floor((360 - normalizedRotation) / segmentAngle) % appData.games.length;
+                const game = appData.games[selectedIndex];
+                
+                appData.selectedGame = game;
+                appData.games = appData.games.filter(g => g !== game);
+                appData.currentChallenge = {
+                    game: game,
+                    players: [],
+                    createdAt: new Date().toISOString()
+                };
+                appData.wheelStep = 'players';
+                appData.rotation = 0;
+            } else if (appData.wheelStep === 'players') {
+                if (appData.availablePlayers.length === 0) {
+                    const challenge = {
+                        ...appData.currentChallenge,
+                        id: Date.now(),
+                        status: 'current'
+                    };
+                    appData.currentChallenges.push(challenge);
+                    startNewChallenge();
+                    return;
+                }
+                
+                const segmentAngle = 360 / appData.availablePlayers.length;
+                const selectedIndex = Math.floor((360 - normalizedRotation) / segmentAngle) % appData.availablePlayers.length;
+                const player = appData.availablePlayers[selectedIndex];
+                
+                appData.availablePlayers = appData.availablePlayers.filter(p => p.id !== player.id);
+                appData.currentChallenge.currentPlayer = player;
+                appData.wheelStep = 'cards';
+                appData.rotation = 0;
+            } else if (appData.wheelStep === 'cards') {
+                const segmentAngle = 360 / appData.availableCards.length;
+                const selectedIndex = Math.floor((360 - normalizedRotation) / segmentAngle) % appData.availableCards.length;
+                const card = appData.availableCards[selectedIndex];
+                
+                appData.currentChallenge.players = appData.currentChallenge.players || [];
+                appData.currentChallenge.players.push({
+                    player: appData.currentChallenge.currentPlayer,
+                    card: card,
+                    points: 0
+                });
+                
+                appData.availableCards = appData.availableCards.filter(c => c !== card);
+                appData.wheelStep = 'players';
+                appData.rotation = 0;
+            }
+            
+            render();
+        }
+
+        // التحديات الحالية
+        function renderCurrentChallenges() {
+            return `
+                <div class="container">
+                    <div class="header">
+                        <button class="btn btn-back" onclick="goBack()">← رجوع</button>
+                        <h2 class="title">التحديات الحالية</h2>
+                        <div></div>
+                    </div>
+                    ${appData.currentChallenges.length === 0 ? 
+                        '<p class="text-center text-gray" style="font-size: 1.5rem; margin-top: 50px;">لا توجد تحديات حالية</p>' :
+                        appData.currentChallenges.map((challenge, idx) => `
+                            <div class="card">
+                                <h3 class="card-title">${challenge.game}</h3>
+                                <p class="text-sm text-gray mb-4">تاريخ الإنشاء: ${new Date(challenge.createdAt).toLocaleString('ar-EG')}</p>
+                                ${challenge.players.map(p => `
+                                    <div class="list-item">
+                                        <span>${p.player.name}</span>
+                                        <span style="color: #FFD700;">${p.card}</span>
+                                    </div>
+                                `).join('')}
+                                ${appData.currentUser.type === 'admin' ? `
+                                    <div class="btn-group mt-4">
+                                        <button class="btn btn-success" onclick="finishChallenge(${idx})">إنهاء التحدي</button>
+                                        <button class="btn btn-danger" onclick="deleteCurrentChallenge(${idx})">حذف التحدي</button>
+                                    </div>
+                                ` : ''}
+                            </div>
+                        `).join('')
+                    }
+                </div>
+            `;
+        }
+
+        function finishChallenge(index) {
+            const challenge = appData.currentChallenges[index];
+            const pointsData = {};
+            
+            challenge.players.forEach(p => {
+                const points = prompt(`أدخل نقاط ${p.player.name}:`);
+                pointsData[p.player.id] = parseInt(points) || 0;
+            });
+            
+            const updatedChallenge = {
+                ...challenge,
+                players: challenge.players.map(p => ({
+                    ...p,
+                    points: pointsData[p.player.id] || 0
+                })),
+                status: 'saved',
+                completedAt: new Date().toISOString()
+            };
+            
+            appData.players = appData.players.map(player => {
+                const challengePlayer = updatedChallenge.players.find(p => p.player.id === player.id);
+                if (challengePlayer) {
+                    return {
+                        ...player,
+                        points: player.points + challengePlayer.points,
+                        challenges: player.challenges + 1,
+                        cards: player.cards + 1
+                    };
+                }
+                return player;
+            });
+            
+            appData.savedChallenges.push(updatedChallenge);
+            appData.currentChallenges.splice(index, 1);
+            render();
+        }
+
+        function deleteCurrentChallenge(index) {
+            if (confirm('هل أنت متأكد من حذف هذا التحدي؟')) {
+                appData.currentChallenges.splice(index, 1);
+                render();
+            }
+        }
+
+        // التحديات المحفوظة
+        function renderSavedChallenges() {
+            return `
+                <div class="container">
+                    <div class="header">
+                        <button class="btn btn-back" onclick="goBack()">← رجوع</button>
+                        <h2 class="title">التحديات المحفوظة</h2>
+                        <div></div>
+                    </div>
+                    ${appData.savedChallenges.length === 0 ?
+                        '<p class="text-center text-gray" style="font-size: 1.5rem; margin-top: 50px;">لا توجد تحديات محفوظة</p>' :
+                        appData.savedChallenges.map((challenge, idx) => `
+                            <div class="card" style="border-color: #10B981;">
+                                <h3 class="card-title">${challenge.game}</h3>
+                                <p class="text-sm text-gray mb-4">تم الإنهاء: ${new Date(challenge.completedAt).toLocaleString('ar-EG')}</p>
+                                ${challenge.players.map(p => `
+                                    <div class="list-item">
+                                        <span>${p.player.name}</span>
+                                        <span style="color: #FFD700;">${p.card}</span>
+                                        <span style="color: #10B981; font-weight: bold;">${p.points} نقطة</span>
+                                    </div>
+                                `).join('')}
+                                ${appData.currentUser.type === 'admin' ? `
+                                    <button class="btn btn-danger mt-4" style="width: 100%;" onclick="deleteSavedChallenge(${idx})">
+                                        حذف التحدي
+                                    </button>
+                                ` : ''}
+                            </div>
+                        `).join('')
+                    }
+                </div>
+            `;
+        }
+
+        function deleteSavedChallenge(index) {
+            if (confirm('هل أنت متأكد من حذف هذا التحدي؟ سيتم خصم النقاط من اللاعبين.')) {
+                const challenge = appData.savedChallenges[index];
+                
+                appData.players = appData.players.map(player => {
+                    const challengePlayer = challenge.players.find(p => p.player.id === player.id);
+                    if (challengePlayer) {
+                        return {
+                            ...player,
+                            points: Math.max(0, player.points - challengePlayer.points),
+                            challenges: Math.max(0, player.challenges - 1),
+                            cards: Math.max(0, player.cards - 1)
+                        };
+                    }
+                    return player;
+                });
+                
+                appData.savedChallenges.splice(index, 1);
+                render();
+            }
+        }
+
+        // ترتيب اللاعبين
+        function renderRanking() {
+            const sortedPlayers = [...appData.players].sort((a, b) => b.points - a.points);
+            
+            return `
+                <div class="container">
+                    <div class="header">
+                        <button class="btn btn-back" onclick="goBack()">← رجوع</button>
+                        <h2 class="title">ترتيب اللاعبين</h2>
+                        <div></div>
+                    </div>
+                    ${appData.currentUser.type === 'admin' ? `
+                        <button class="btn btn-info mb-4" onclick="navigateTo('adjust-points')">
+                            خصم/إضافة نقاط
+                        </button>
+                    ` : ''}
+                    ${sortedPlayers.map((player, index) => `
+                        <div class="list-item" style="cursor: pointer; padding: 20px;" onclick="viewPlayerDetails(${player.id})">
+                            <div class="flex items-center gap-4">
+                                <span class="player-rank rank-${index + 1}">${index + 1}</span>
+                                <div>
+                                    <div style="font-size: 1.5rem; font-weight: bold;">${player.name}</div>
+                                    <div class="text-gray">النقاط: ${player.points}</div>
+                                </div>
+                            </div>
+                            ${index === 0 ? '<span style="font-size: 3rem;">🏆</span>' : ''}
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function viewPlayerDetails(playerId) {
+            appData.selectedPlayer = appData.players.find(p => p.id === playerId);
+            navigateTo('player-details');
+        }
+
+        // تفاصيل اللاعب
+        function renderPlayerDetails() {
+            const player = appData.selectedPlayer;
+            
+            return `
+                <div class="container">
+                    <div class="header">
+                        <button class="btn btn-back" onclick="goBack()">← رجوع</button>
+                        <h2 class="title">معلومات اللاعب</h2>
+                        <div></div>
+                    </div>
+                    <div class="card" style="max-width: 600px; margin: 0 auto;">
+                        <h3 class="card-title text-center" style="font-size: 2rem;">${player.name}</h3>
+                        <div class="list-item mb-4">
+                            <span style="font-weight: bold;">النقاط:</span>
+                            <span style="color: #FFD700; font-size: 1.5rem; font-weight: bold;">${player.points}</span>
+                        </div>
+                        <div class="list-item mb-4">
+                            <span style="font-weight: bold;">التحديات:</span>
+                            <span style="color: #10B981; font-size: 1.5rem; font-weight: bold;">${player.challenges}</span>
+                        </div>
+                        <div class="list-item mb-4">
+                            <span style="font-weight: bold;">البطاقات:</span>
+                            <span style="color: #3B82F6; font-size: 1.5rem; font-weight: bold;">${player.cards}</span>
+                        </div>
+                        ${player.instagram ? `
+                            <a href="${player.instagram}" target="_blank" class="btn" 
+                               style="width: 100%; background: linear-gradient(135deg, #833AB4, #FD1D1D, #FCB045); text-decoration: none; color: white; display: block; text-align: center;">
+                                حساب الإنستغرام
+                            </a>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+        }
+
+        // تعديل النقاط
+        function renderAdjustPoints() {
+            return `
+                <div class="container">
+                    <div class="header">
+                        <button class="btn btn-back" onclick="goBack()">← رجوع</button>
+                        <h2 class="title">خصم/إضافة نقاط</h2>
+                        <div></div>
+                    </div>
+                    <div class="card" style="max-width: 600px; margin: 0 auto;">
+                        <div class="form-group">
+                            <label>اختر اللاعب:</label>
+                            <select id="adjustPlayerId">
+                                <option value="">اختر اللاعب</option>
+                                ${appData.players.map(p => `
+                                    <option value="${p.id}">${p.name} - ${p.points} نقطة</option>
+                                `).join('')}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>إضافة نقاط:</label>
+                            <input type="number" id="addPoints" class="input" placeholder="0">
+                        </div>
+                        <div class="form-group">
+                            <label>خصم نقاط:</label>
+                            <input type="number" id="subtractPoints" class="input" placeholder="0">
+                        </div>
+                        <button class="btn btn-primary" style="width: 100%;" onclick="applyPointsAdjustment()">
+                            تطبيق التعديلات
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function applyPointsAdjustment() {
+            const playerId = parseInt(document.getElementById('adjustPlayerId').value);
+            const addPoints = parseInt(document.getElementById('addPoints').value) || 0;
+            const subtractPoints = parseInt(document.getElementById('subtractPoints').value) || 0;
+            
+            if (!playerId) {
+                alert('الرجاء اختيار لاعب');
+                return;
+            }
+            
+            appData.players = appData.players.map(p => {
+                if (p.id === playerId) {
+                    let newPoints = p.points + addPoints - subtractPoints;
+                    return { ...p, points: Math.max(0, newPoints) };
+                }
+                return p;
+            });
+            
+            alert('تم تحديث النقاط بنجاح');
+            goBack();
+        }
+
+        // الإعدادات
+        function renderSettings() {
+            const settingsMenu = [
+                { label: 'إضافة أسماء الألعاب 🎮', page: 'manage-games' },
+                { label: 'إضافة أسماء اللاعبين 👤', page: 'manage-players' },
+                { label: 'إضافة أسماء البطاقات 🃏', page: 'manage-cards' },
+                { label: 'تغيير اسم الموقع 💳', page: 'change-site-name' },
+                { label: 'تصفير الموقع بالكامل 🗃', page: 'reset-all' },
+                { label: 'تصفير النقاط بالكامل ⭐', page: 'reset-points' },
+                { label: 'إدارة الحسابات 🪪', page: 'manage-accounts' }
+            ];
+            
+            return `
+                <div class="container">
+                    <div class="header">
+                        <button class="btn btn-back" onclick="goBack()">← رجوع</button>
+                        <h2 class="title">الإعدادات</h2>
+                        <div></div>
+                    </div>
+                    <div class="settings-grid" style="max-width: 700px; margin: 0 auto;">
+                        ${settingsMenu.map(item => `
+                            <button class="settings-btn" onclick="navigateTo('${item.page}')">
+                                ${item.label}
+                            </button>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        // إدارة الألعاب
+        function renderManageGames() {
+            return `
+                <div class="container">
+                    <div class="header">
+                        <button class="btn btn-back" onclick="goBack()">← رجوع</button>
+                        <h2 class="title">إدارة الألعاب</h2>
+                        <div></div>
+                    </div>
+                    <div style="max-width: 700px; margin: 0 auto;">
+                        <div class="flex gap-4 mb-4">
+                            <input type="text" id="newGame" class="input" placeholder="اسم اللعبة" style="flex: 1;">
+                            <button class="btn btn-success" onclick="addGame()">إضافة</button>
+                        </div>
+                        ${appData.games.map((game, idx) => `
+                            <div class="list-item">
+                                <span>${game}</span>
+                                <button class="btn btn-danger" style="padding: 8px 16px;" onclick="deleteGame(${idx})">حذف</button>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function addGame() {
+            const input = document.getElementById('newGame');
+            if (input.value.trim()) {
+                appData.games.push(input.value.trim());
+                render();
+            }
+        }
+
+        function deleteGame(index) {
+            appData.games.splice(index, 1);
+            render();
+        }
+
+        // إدارة اللاعبين
+        function renderManagePlayers() {
+            return `
+                <div class="container">
+                    <div class="header">
+                        <button class="btn btn-back" onclick="goBack()">← رجوع</button>
+                        <h2 class="title">إدارة اللاعبين</h2>
+                        <div></div>
+                    </div>
+                    <div style="max-width: 700px; margin: 0 auto;">
+                        <div class="card mb-4">
+                            <h3 class="card-title">إضافة لاعب جديد</h3>
+                            <input type="text" id="newPlayerName" class="input" placeholder="اسم اللاعب">
+                            <input type="text" id="newPlayerInstagram" class="input" placeholder="رابط الإنستغرام (اختياري)">
+                            <button class="btn btn-success" style="width: 100%;" onclick="addPlayer()">إضافة لاعب</button>
+                        </div>
+                        ${appData.players.map((player, idx) => `
+                            <div class="list-item">
+                                <div>
+                                    <div style="font-weight: bold;">${player.name}</div>
+                                    <div class="text-sm text-gray">${player.points} نقطة</div>
+                                </div>
+                                <button class="btn btn-danger" style="padding: 8px 16px;" onclick="deletePlayer(${idx})">حذف</button>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function addPlayer() {
+            const name = document.getElementById('newPlayerName').value.trim();
+            const instagram = document.getElementById('newPlayerInstagram').value.trim();
+            
+            if (name) {
+                appData.players.push({
+                    id: Date.now(),
+                    name: name,
+                    points: 0,
+                    challenges: 0,
+                    cards: 0,
+                    instagram: instagram
+                });
+                render();
+            }
+        }
+
+        function deletePlayer(index) {
+            if (confirm(`هل أنت متأكد من حذف ${appData.players[index].name}؟`)) {
+                appData.players.splice(index, 1);
+                render();
+            }
+        }
+
+        // إدارة البطاقات
+        function renderManageCards() {
+            return `
+                <div class="container">
+                    <div class="header">
+                        <button class="btn btn-back" onclick="goBack()">← رجوع</button>
+                        <h2 class="title">إدارة البطاقات</h2>
+                        <div></div>
+                    </div>
+                    <div style="max-width: 700px; margin: 0 auto;">
+                        <div class="flex gap-4 mb-4">
+                            <input type="text" id="newCard" class="input" placeholder="اسم البطاقة" style="flex: 1;">
+                            <button class="btn btn-success" onclick="addCard()">إضافة</button>
+                        </div>
+                        ${appData.cards.map((card, idx) => `
+                            <div class="list-item">
+                                <span>${card}</span>
+                                <button class="btn btn-danger" style="padding: 8px 16px;" onclick="deleteCard(${idx})">حذف</button>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function addCard() {
+            const input = document.getElementById('newCard');
+            if (input.value.trim()) {
+                appData.cards.push(input.value.trim());
+                render();
+            }
+        }
+
+        function deleteCard(index) {
+            appData.cards.splice(index, 1);
+            render();
+        }
+
+        // تغيير اسم الموقع
+        function renderChangeSiteName() {
+            return `
+                <div class="container">
+                    <div class="header">
+                        <button class="btn btn-back" onclick="goBack()">← رجوع</button>
+                        <h2 class="title">تغيير اسم الموقع</h2>
+                        <div></div>
+                    </div>
+                    <div class="card" style="max-width: 600px; margin: 0 auto;">
+                        <input type="text" id="newSiteName" class="input" value="${appData.siteName}">
+                        <button class="btn btn-success" style="width: 100%;" onclick="saveSiteName()">حفظ</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function saveSiteName() {
+            const newName = document.getElementById('newSiteName').value.trim();
+            if (newName) {
+                appData.siteName = newName;
+                goBack();
+            }
+        }
+
+        // تصفير الموقع
+        function renderResetAll() {
+            return `
+                <div class="container">
+                    <div class="header">
+                        <button class="btn btn-back" onclick="goBack()">← رجوع</button>
+                        <h2 class="title">تصفير الموقع</h2>
+                        <div></div>
+                    </div>
+                    <div class="card" style="max-width: 600px; margin: 0 auto; border-color: #EF4444;">
+                        <p class="text-center" style="color: #EF4444; font-size: 1.3rem; font-weight: bold; margin-bottom: 20px;">
+                            ⚠️ تحذير: سيتم حذف جميع البيانات بشكل نهائي!
+                        </p>
+                        <button class="btn btn-danger" style="width: 100%;" onclick="resetAllData()">
+                            تصفير الموقع بالكامل
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function resetAllData() {
+            if (confirm('هل أنت متأكد من تصفير الموقع بالكامل؟ هذا الإجراء لا يمكن التراجع عنه!')) {
+                appData.games = ['Cs2'];
+                appData.players = [{ id: 1, name: 'Maherco', points: 0, challenges: 0, cards: 0, instagram: '' }];
+                appData.cards = ['X2'];
+                appData.currentChallenges = [];
+                appData.savedChallenges = [];
+                appData.notes = [];
+                goBack();
+            }
+        }
+
+        // تصفير النقاط
+        function renderResetPoints() {
+            return `
+                <div class="container">
+                    <div class="header">
+                        <button class="btn btn-back" onclick="goBack()">← رجوع</button>
+                        <h2 class="title">تصفير النقاط</h2>
+                        <div></div>
+                    </div>
+                    <div class="card" style="max-width: 600px; margin: 0 auto; border-color: #EF4444;">
+                        <p class="text-center" style="color: #EF4444; font-size: 1.3rem; font-weight: bold; margin-bottom: 20px;">
+                            ⚠️ سيتم تصفير نقاط جميع اللاعبين!
+                        </p>
+                        <button class="btn btn-danger" style="width: 100%;" onclick="resetPoints()">
+                            تصفير النقاط
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function resetPoints() {
+            if (confirm('هل أنت متأكد من تصفير جميع النقاط؟')) {
+                appData.players = appData.players.map(p => ({
+                    ...p,
+                    points: 0,
+                    challenges: 0,
+                    cards: 0
+                }));
+                goBack();
+            }
+        }
+
+        // إدارة الحسابات
+        function renderManageAccounts() {
+            return `
+                <div class="container">
+                    <div class="header">
+                        <button class="btn btn-back" onclick="goBack()">← رجوع</button>
+                        <h2 class="title">إدارة الحسابات</h2>
+                        <div></div>
+                    </div>
+                    <div style="max-width: 700px; margin: 0 auto;">
+                        <div class="card mb-4">
+                            <h3 class="card-title">إضافة حساب جديد</h3>
+                            <input type="text" id="newUsername" class="input" placeholder="اسم المستخدم">
+                            <input type="password" id="newPassword" class="input" placeholder="كلمة المرور">
+                            <select id="newUserType" class="input">
+                                <option value="admin">مدير (Admin)</option>
+                                <option value="player">لاعب (Player)</option>
+                                <option value="guest">ضيف (Guest)</option>
+                            </select>
+                            <button class="btn btn-success" style="width: 100%;" onclick="addUser()">إضافة حساب</button>
+                        </div>
+                        ${appData.users.map((user, idx) => `
+                            <div class="card">
+                                <div class="flex justify-between items-center">
+                                    <div>
+                                        <div style="font-weight: bold; font-size: 1.2rem;">${user.username}</div>
+                                        <div class="text-sm text-gray">
+                                            النوع: ${user.type === 'admin' ? 'مدير' : user.type === 'player' ? 'لاعب' : 'ضيف'}
+                                        </div>
+                                        <div class="text-sm text-gray">
+                                            تاريخ الإنشاء: ${new Date(user.createdAt).toLocaleString('ar-EG')}
+                                        </div>
+                                    </div>
+                                    ${user.username !== 'admin' ? `
+                                        <button class="btn btn-danger" onclick="deleteUser(${idx})">حذف</button>
+                                    ` : ''}
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function addUser() {
+            const username = document.getElementById('newUsername').value.trim();
+            const password = document.getElementById('newPassword').value.trim();
+            const type = document.getElementById('newUserType').value;
+            
+            if (username && password) {
+                appData.users.push({
+                    id: Date.now(),
+                    username: username,
+                    password: password,
+                    type: type,
+                    createdAt: new Date().toISOString()
+                });
+                render();
+            }
+        }
+
+        function deleteUser(index) {
+            if (confirm(`هل أنت متأكد من حذف حساب ${appData.users[index].username}؟`)) {
+                appData.users.splice(index, 1);
+                render();
+            }
+        }
+
+        // الملاحظات
+        function renderNotes() {
+            return `
+                <div class="container">
+                    <div class="header">
+                        <button class="btn btn-back" onclick="goBack()">← رجوع</button>
+                        <h2 class="title">الملاحظات</h2>
+                        <div></div>
+                    </div>
+                    <div style="max-width: 800px; margin: 0 auto;">
+                        ${appData.currentUser.type === 'admin' ? `
+                            <div class="card mb-4">
+                                <h3 class="card-title">إضافة ملاحظة جديدة</h3>
+                                <input type="text" id="noteTitle" class="input" placeholder="عنوان الملاحظة">
+                                <textarea id="noteContent" class="input" placeholder="محتوى الملاحظة"></textarea>
+                                <button class="btn btn-success" style="width: 100%;" onclick="addNote()">إضافة ملاحظة</button>
+                            </div>
+                        ` : ''}
+                        ${appData.notes.length === 0 ? 
+                            '<p class="text-center text-gray" style="font-size: 1.5rem; margin-top: 50px;">لا توجد ملاحظات</p>' :
+                            appData.notes.map((note, idx) => `
+                                <div class="card">
+                                    <h3 class="card-title">${note.title}</h3>
+                                    <p style="color: #D1D5DB; white-space: pre-wrap; margin-bottom: 15px;">${note.content}</p>
+                                    <div class="flex justify-between items-center">
+                                        <p class="text-sm text-gray">
+                                            ${new Date(note.updatedAt || note.createdAt).toLocaleString('ar-EG')}
+                                        </p>
+                                        ${appData.currentUser.type === 'admin' ? `
+                                            <div class="flex gap-4">
+                                                <button class="btn btn-info" style="padding: 8px 16px;" onclick="editNote(${idx})">تعديل</button>
+                                                <button class="btn btn-danger" style="padding: 8px 16px;" onclick="deleteNote(${idx})">حذف</button>
+                                            </div>
+                                        ` : ''}
+                                    </div>
+                                </div>
+                            `).join('')
+                        }
+                    </div>
+                </div>
+            `;
+        }
+
+        function addNote() {
+            const title = document.getElementById('noteTitle').value.trim();
+            const content = document.getElementById('noteContent').value.trim();
+            
+            if (title && content) {
+                appData.notes.push({
+                    id: Date.now(),
+                    title: title,
+                    content: content,
+                    createdAt: new Date().toISOString()
+                });
+                render();
+            }
+        }
+
+        function editNote(index) {
+            const note = appData.notes[index];
+            const newTitle = prompt('عنوان الملاحظة:', note.title);
+            if (newTitle) {
+                const newContent = prompt('محتوى الملاحظة:', note.content);
+                if (newContent) {
+                    appData.notes[index] = {
+                        ...note,
+                        title: newTitle,
+                        content: newContent,
+                        updatedAt: new Date().toISOString()
+                    };
+                    render();
+                }
+            }
+        }
+
+        function deleteNote(index) {
+            if (confirm('هل أنت متأكد من حذف هذه الملاحظة؟')) {
+                appData.notes.splice(index, 1);
+                render();
+            }
+        }
+
+        // الرندر الرئيسي
+        function render() {
+            const app = document.getElementById('app');
+            let content = '';
+            
+            switch(appData.currentPage) {
+                case 'login':
+                    content = renderLogin();
+                    break;
+                case 'home':
+                    content = renderHome();
+                    break;
+                case 'wheel':
+                    content = renderWheel();
+                    break;
+                case 'current':
+                    content = renderCurrentChallenges();
+                    break;
+                case 'saved':
+                    content = renderSavedChallenges();
+                    break;
+                case 'ranking':
+                    content = renderRanking();
+                    break;
+                case 'player-details':
+                    content = renderPlayerDetails();
+                    break;
+                case 'adjust-points':
+                    content = renderAdjustPoints();
+                    break;
+                case 'settings':
+                    content = renderSettings();
+                    break;
+                case 'manage-games':
+                    content = renderManageGames();
+                    break;
+                case 'manage-players':
+                    content = renderManagePlayers();
+                    break;
+                case 'manage-cards':
+                    content = renderManageCards();
+                    break;
+                case 'change-site-name':
+                    content = renderChangeSiteName();
+                    break;
+                case 'reset-all':
+                    content = renderResetAll();
+                    break;
+                case 'reset-points':
+                    content = renderResetPoints();
+                    break;
+                case 'manage-accounts':
+                    content = renderManageAccounts();
+                    break;
+                case 'notes':
+                    content = renderNotes();
+                    break;
+            }
+            
+            app.innerHTML = content;
+            
+            // إضافة event listener للدولاب
+            if (appData.currentPage === 'wheel') {
+                setTimeout(() => {
+                    const wheel = document.getElementById('wheel');
+                    if (wheel) {
+                        wheel.addEventListener('click', spinWheel);
+                    }
+                }, 100);
+            }
+        }
+
+        // بدء التطبيق
+        createSparkles();
+        render();
+    </script>
+</body>
+</html>
