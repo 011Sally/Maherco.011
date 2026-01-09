@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Maherco.Challenges</title>
     <style>
-        /* (الأنماط كما هي بدون تغيير) */
         * {
             margin: 0;
             padding: 0;
@@ -184,10 +183,11 @@
             height: 400px;
         }
 
+        /* تعديل مدة الدوران إلى 6 ثواني */
         #wheel {
             width: 100%;
             height: 100%;
-            transition: transform 3s cubic-bezier(0.17, 0.67, 0.12, 0.99);
+            transition: transform 6s cubic-bezier(0.17, 0.67, 0.12, 0.99); 
             cursor: pointer;
         }
 
@@ -458,7 +458,6 @@
             text-align: center;
         }
 
-        /* رسالة بدء التحدي */
         .start-challenge-text {
             font-size: 2rem;
             color: #FFD700;
@@ -473,7 +472,6 @@
             text-shadow: 0 0 30px rgba(255, 215, 0, 1);
         }
 
-        /* رسالة التحذير */
         .challenge-warning {
             background: rgba(239, 68, 68, 0.3);
             border: 3px solid #EF4444;
@@ -517,70 +515,34 @@
             rotation: 0,
             isSpinning: false,
             selectedPlayer: null,
-            // إعدادات الصوت الجديدة
-            soundEnabled: true // تمكين الصوت افتراضياً
+            soundEnabled: true
         };
 
-        // Web Audio API للصوت الميكانيكي المتقن
-        const AudioContext = window.AudioContext || window.webkitAudioContext;
-        const audioContext = new AudioContext();
-
-        /**
-         * دالة تشغيل صوت الدولاب الميكانيكي المتقن
-         * يقوم بتوليد صوت ميكانيكي يزيد تدريجياً ثم يتناقص مع نهاية الدوران
-         * @param {number} duration - مدة الصوت بالثواني (تطابق مدة دوران العجلة)
-         */
-        function playMechanicalWheelSound(duration = 3) {
-            if (!appData.soundEnabled) return; // التحقق من إعدادات الصوت
-
+        // عنصر الصوت المخفي لصوت الدولاب الميكانيكي الجديد
+        const audioElement = document.createElement('audio');
+        audioElement.id = 'wheel-audio';
+        audioElement.preload = 'auto';
+        audioElement.style.display = 'none';
+        
+        // مكان وضع Data URI للصوت الجديد
+       const WHEEL_SOUND_DATA_URI = 'wheel-voice.mp3';
+        
+        // دالة تشغيل صوت الدولاب الجديد
+        function playWheelSound() {
+            if (!appData.soundEnabled) return;
+            
             try {
-                // إنشاء مولد الموجة الرئيسي (صوت ميكانيكي خشن)
-                const oscillator = audioContext.createOscillator();
-                const gainNode = audioContext.createGain();
-                const filterNode = audioContext.createBiquadFilter();
-                
-                // ربط العقد الصوتية
-                oscillator.connect(filterNode);
-                filterNode.connect(gainNode);
-                gainNode.connect(audioContext.destination);
-                
-                // إعدادات الموجة الميكانيكية
-                oscillator.type = 'sawtooth'; // موجة منشارية للصوت الميكانيكي
-                filterNode.type = 'lowpass';
-                filterNode.frequency.value = 2000; // تصفية لجعل الصوت أكثر نعومة
-                
-                // الجدول الزمني للصوت
-                const now = audioContext.currentTime;
-                
-                // بداية الصوت: زيادة سريعة في التردد والمستوى
-                oscillator.frequency.setValueAtTime(100, now);
-                oscillator.frequency.exponentialRampToValueAtTime(300, now + 0.5);
-                oscillator.frequency.exponentialRampToValueAtTime(400, now + 1);
-                
-                // منتصف الصوت: استقرار عالي
-                oscillator.frequency.exponentialRampToValueAtTime(450, now + 1.5);
-                
-                // نهاية الصوت: تناقص تدريجي مع التباطؤ
-                oscillator.frequency.exponentialRampToValueAtTime(200, now + 2.5);
-                oscillator.frequency.exponentialRampToValueAtTime(80, now + duration);
-                
-                // مستوى الصوت (زيادة تدريجية ثم تناقص)
-                gainNode.gain.setValueAtTime(0, now);
-                gainNode.gain.linearRampToValueAtTime(0.15, now + 0.5);
-                gainNode.gain.linearRampToValueAtTime(0.2, now + 1);
-                gainNode.gain.linearRampToValueAtTime(0.15, now + 2);
-                gainNode.gain.linearRampToValueAtTime(0.05, now + duration);
-                
-                // بدء وتوقف الصوت
-                oscillator.start(now);
-                oscillator.stop(now + duration);
-                
+                const audio = document.getElementById('wheel-audio');
+                if (audio) {
+                    audio.currentTime = 0;
+                    audio.play().catch(e => console.log('مشكلة في تشغيل الصوت:', e));
+                }
             } catch (e) {
                 console.log('مشكلة في تشغيل الصوت الميكانيكي:', e);
             }
         }
 
-        // دوال التنقل (تم إزالة جميع أصوات النقر القديمة)
+        // دوال التنقل
         function navigateTo(page) {
             appData.pageHistory.push(appData.currentPage);
             appData.currentPage = page;
@@ -619,7 +581,7 @@
             });
         }
 
-        // تحميل وحفظ البيانات (تم إضافة حفظ إعدادات الصوت)
+        // تحميل وحفظ البيانات
         function loadData() {
             try {
                 const savedData = localStorage.getItem('MahercoChallengesData');
@@ -628,7 +590,6 @@
                     safeMerge(appData, parsed);
                 }
                 
-                // تحميل إعدادات الصوت
                 const savedSound = localStorage.getItem('MahercoSoundEnabled');
                 if (savedSound !== null) {
                     appData.soundEnabled = JSON.parse(savedSound);
@@ -659,7 +620,7 @@
                     savedChallenges: appData.savedChallenges,
                     notes: appData.notes,
                     siteName: appData.siteName,
-                    soundEnabled: appData.soundEnabled // حفظ إعدادات الصوت
+                    soundEnabled: appData.soundEnabled
                 };
                 localStorage.setItem('MahercoChallengesData', JSON.stringify(dataToSave));
                 
@@ -751,7 +712,6 @@
             `;
         }
 
-        // دولاب الحظ - مع التعديلات المطلوبة
         function renderWheel() {
             const hasIncompleteChallenges = appData.currentChallenges.length > 0;
             
@@ -790,36 +750,48 @@
 
             let svg = `<svg viewBox="0 0 200 200" id="wheel">`;
             
-            items.forEach((item, index) => {
-                const startAngle = index * segmentAngle - 90;
-                const endAngle = startAngle + segmentAngle;
-                const largeArcFlag = segmentAngle > 180 ? 1 : 0;
-                
-                const x1 = 100 + 100 * Math.cos(startAngle * Math.PI / 180);
-                const y1 = 100 + 100 * Math.sin(startAngle * Math.PI / 180);
-                const x2 = 100 + 100 * Math.cos(endAngle * Math.PI / 180);
-                const y2 = 100 + 100 * Math.sin(endAngle * Math.PI / 180);
-                
-                const textAngle = startAngle + segmentAngle / 2;
-                const textX = 100 + 60 * Math.cos(textAngle * Math.PI / 180);
-                const textY = 100 + 60 * Math.sin(textAngle * Math.PI / 180);
-                
+            // إصلاح مشكلة اللون الأسود عند وجود عنصر واحد فقط
+            if (items.length === 1) {
+                // عند وجود عنصر واحد، ارسم دائرة كاملة باللون الأزرق
                 svg += `
-                    <path d="M 100 100 L ${x1} ${y1} A 100 100 0 ${largeArcFlag} 1 ${x2} ${y2} Z"
-                          fill="${colors[index % colors.length]}"
-                          stroke="#000"
-                          stroke-width="2"/>
-                    <text x="${textX}" y="${textY}"
-                          fill="white"
-                          font-size="10"
-                          font-weight="bold"
-                          text-anchor="middle"
-                          dominant-baseline="middle"
-                          transform="rotate(${textAngle + 90}, ${textX}, ${textY})">
-                        ${item}
+                    <circle cx="100" cy="100" r="100" fill="#3B82F6" stroke="#000" stroke-width="2"/>
+                    <text x="100" y="100" fill="white" font-size="12" font-weight="bold" text-anchor="middle" dominant-baseline="middle">
+                        ${items[0]}
                     </text>
                 `;
-            });
+            } else {
+                // الرسم العادي لعناصر متعددة
+                items.forEach((item, index) => {
+                    const startAngle = index * segmentAngle - 90;
+                    const endAngle = startAngle + segmentAngle;
+                    const largeArcFlag = segmentAngle > 180 ? 1 : 0;
+                    
+                    const x1 = 100 + 100 * Math.cos(startAngle * Math.PI / 180);
+                    const y1 = 100 + 100 * Math.sin(startAngle * Math.PI / 180);
+                    const x2 = 100 + 100 * Math.cos(endAngle * Math.PI / 180);
+                    const y2 = 100 + 100 * Math.sin(endAngle * Math.PI / 180);
+                    
+                    const textAngle = startAngle + segmentAngle / 2;
+                    const textX = 100 + 60 * Math.cos(textAngle * Math.PI / 180);
+                    const textY = 100 + 60 * Math.sin(textAngle * Math.PI / 180);
+                    
+                    svg += `
+                        <path d="M 100 100 L ${x1} ${y1} A 100 100 0 ${largeArcFlag} 1 ${x2} ${y2} Z"
+                              fill="${colors[index % colors.length]}"
+                              stroke="#000"
+                              stroke-width="2"/>
+                        <text x="${textX}" y="${textY}"
+                              fill="white"
+                              font-size="10"
+                              font-weight="bold"
+                              text-anchor="middle"
+                              dominant-baseline="middle"
+                              transform="rotate(${textAngle + 90}, ${textX}, ${textY})">
+                            ${item}
+                        </text>
+                    `;
+                });
+            }
             
             svg += `<circle cx="100" cy="100" r="20" fill="white"/></svg>`;
 
@@ -851,7 +823,7 @@
             let wheelDisabled = false;
             
             if (hasActiveChallenge) {
-                // يوجد تحدي حالي لم ينتهِ
+                // يوجد تحدي حالي لم ينتهِ - تعطيل الدولاب
                 wheelMessage = '<div class="challenge-warning">⚠️ أنهِ التحدي الحالي لكي تستطيع بدء تحدي جديد</div>';
                 wheelDisabled = true;
             } else if (!isChallengeInProgress) {
@@ -893,22 +865,28 @@
         }
 
         function spinWheel() {
-            if (appData.isSpinning) return;
+            // التحقق من وجود تحدي حالي لمنع الدوران
+            if (appData.isSpinning || appData.currentChallenges.length > 0) {
+                return; // منع الدوران إذا كان هناك تحدي حالي أو العجلة تدور بالفعل
+            }
             
-            // تشغيل الصوت الميكانيكي عند بدء الدوران
-            playMechanicalWheelSound(3);
+            // تشغيل الصوت الجديد عند بدء الدوران
+            playWheelSound();
             
             appData.isSpinning = true;
             const spins = 5 + Math.random() * 5;
             appData.rotation += 360 * spins + Math.random() * 360;
             
             const wheel = document.getElementById('wheel');
-            wheel.style.transform = `rotate(${appData.rotation}deg)`;
+            if (wheel) {
+                wheel.style.transform = `rotate(${appData.rotation}deg)`;
+            }
             
+            // تعديل وقت الإنهاء إلى 6 ثواني (6000 مللي ثانية)
             setTimeout(() => {
                 appData.isSpinning = false;
                 handleWheelResult();
-            }, 3000);
+            }, 6000); // تم تغيير من 3000 إلى 6000
         }
 
         function handleWheelResult() {
@@ -1022,8 +1000,7 @@
                     <button class="btn btn-success" onclick="confirmFinishChallenge(${index})">✅ تأكيد النقاط</button>
                     <button class="btn btn-danger" onclick="cancelFinishChallenge()">❌ إلغاء</button>
                 </div>
-            `;
-            
+`; 
             const app = document.getElementById('app');
             app.innerHTML = `
                 <div class="container">
@@ -1307,14 +1284,14 @@
             goBack();
         }
 
-        // الإعدادات - تم إضافة خيار إعدادات الصوت
+        // الإعدادات - مع إضافة إعدادات الصوت
         function renderSettings() {
             const settingsMenu = [
                 { label: 'إضافة أسماء الألعاب 🎮', page: 'manage-games' },
                 { label: 'إضافة أسماء اللاعبين 👤', page: 'manage-players' },
                 { label: 'إضافة أسماء البطاقات 🃏', page: 'manage-cards' },
                 { label: 'تغيير اسم الموقع 💳', page: 'change-site-name' },
-                { label: 'إعدادات الصوت 🔊', page: 'sound-settings' }, // زر إعدادات الصوت الجديد
+                { label: 'إعدادات الصوت 🔊', page: 'sound-settings' },
                 { label: 'تصفير الموقع بالكامل 🗃', page: 'reset-all' },
                 { label: 'تصفير النقاط بالكامل ⭐', page: 'reset-points' },
                 { label: 'إدارة الحسابات 🪪', page: 'manage-accounts' }
@@ -1338,7 +1315,7 @@
             `;
         }
 
-        // صفحة إعدادات الصوت الجديدة
+        // صفحة إعدادات الصوت
         function renderSoundSettings() {
             return `
                 <div class="container">
@@ -1372,13 +1349,9 @@
             `;
         }
 
-        /**
-         * دالة تبديل إعدادات الصوت
-         * @param {boolean} enabled - حالة التفعيل الجديدة
-         */
         function toggleSound(enabled) {
             appData.soundEnabled = enabled;
-            localStorage.setItem('MahercoSoundEnabled', JSON.stringify(enabled)); // حفظ الاختيار
+            localStorage.setItem('MahercoSoundEnabled', JSON.stringify(enabled));
             saveData();
             render();
         }
@@ -1693,9 +1666,9 @@
                         ${appData.currentUser.type === 'admin' ? `
                             <div class="card mb-4">
                                 <h3 class="card-title">إضافة ملاحظة جديدة</h3>
-                                <input type="text" id="noteTitle" class="input" placeholder="عنوان الملاحظة">
-                                <textarea id="noteContent" class="input" placeholder="محتوى الملاحظة"></textarea>
-                                <button class="btn btn-success" style="width: 100%;" onclick="addNote()">إضافة ملاحظة</button>
+                                <input type="text" id="noteTitle" class="input" placeholder="عنوان الملحظة">
+                                <textarea id="noteContent" class="input" placeholder="محتوى الملحظة"></textarea>
+                                <button class="btn btn-success" style="width: 100%;" onclick="addNote()">إضافة ملحظة</button>
                             </div>
                         ` : ''}
                         ${appData.notes.length === 0 ? 
@@ -1741,9 +1714,9 @@
 
         function editNote(index) {
             const note = appData.notes[index];
-            const newTitle = prompt('عنوان الملاحظة:', note.title);
+            const newTitle = prompt('عنوان الملحظة:', note.title);
             if (newTitle) {
-                const newContent = prompt('محتوى الملاحظة:', note.content);
+                const newContent = prompt('محتوى الملحظة:', note.content);
                 if (newContent) {
                     appData.notes[index] = {
                         ...note,
@@ -1758,14 +1731,14 @@
         }
 
         function deleteNote(index) {
-            if (confirm('هل أنت متأكد من حذف هذه الملاحظة؟')) {
+            if (confirm('هل أنت متأكد من حذف هذه الملحظة؟')) {
                 appData.notes.splice(index, 1);
                 saveData();
                 render();
             }
         }
 
-        // الرندر الرئيسي - تم إضافة صفحة إعدادات الصوت
+        // الرندر الرئيسي
         function render() {
             const app = document.getElementById('app');
             let content = '';
@@ -1831,10 +1804,19 @@
             
             app.innerHTML = content;
             
+            // إضافة عنصر الصوت إلى DOM بعد التحميل
+            if (!document.getElementById('wheel-audio')) {
+                document.body.appendChild(audioElement);
+                // تحميل الصوت من Data URI
+                audioElement.src = WHEEL_SOUND_DATA_URI;
+            }
+            
+            // إضافة حدث النقر للعجلة فقط إذا كانت غير معطلة
             if (appData.currentPage === 'wheel') {
                 setTimeout(() => {
                     const wheel = document.getElementById('wheel');
-                    if (wheel) {
+                    if (wheel && appData.currentChallenges.length === 0) {
+                        // إضافة الحدث فقط إذا لم يكن هناك تحدي حالي
                         wheel.addEventListener('click', spinWheel);
                     }
                 }, 100);
