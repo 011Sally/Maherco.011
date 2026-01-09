@@ -20,14 +20,15 @@
             min-height: 100vh;
         }
 
+        /* النيازك والنجوم */
         .star {
             position: fixed;
             clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
             background: linear-gradient(135deg, #FFD700, #FFA500, #FFEB3B);
             box-shadow: 
-                0 0 20px #FFD700,
-                0 0 40px rgba(255, 215, 0, 0.5),
-                inset 0 0 10px rgba(255, 255, 255, 0.8);
+                0 0 30px #FFD700,
+                0 0 60px rgba(255, 215, 0, 0.8),
+                inset 0 0 15px rgba(255, 255, 255, 0.9);
             animation: starPulse 3s infinite ease-in-out;
             pointer-events: none;
             z-index: 1;
@@ -35,12 +36,45 @@
 
         @keyframes starPulse {
             0%, 100% { 
-                opacity: 0.4; 
+                opacity: 0.6; 
                 transform: scale(0.8) rotate(0deg);
             }
             50% { 
                 opacity: 1; 
-                transform: scale(1.3) rotate(180deg);
+                transform: scale(1.5) rotate(180deg);
+            }
+        }
+
+        .meteor {
+            position: fixed;
+            width: 3px;
+            height: 3px;
+            background: linear-gradient(to bottom, transparent, #FFD700, #FFA500);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        .meteor::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100px;
+            height: 2px;
+            background: linear-gradient(to left, transparent, #FFD700, #FFA500);
+            transform: translateX(-100px);
+            border-radius: 50%;
+        }
+
+        @keyframes meteorFall {
+            0% {
+                transform: translateY(-100px) translateX(0) rotate(45deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) translateX(100px) rotate(45deg);
+                opacity: 0;
             }
         }
 
@@ -50,132 +84,7 @@
             padding: 20px;
             max-width: 1200px;
             margin: 0 auto;
-        }
-
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 40px;
-        }
-
-        .title {
-            font-size: 2.5rem;
-            font-weight: bold;
-            color: #FFD700;
-            text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
-        }
-
-        .btn {
-            padding: 12px 24px;
-            border: none;
-            border-radius: 50px;
-            font-size: 1rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-        }
-
-        .btn:hover {
-            transform: scale(1.05);
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #FFD700, #FFA500);
-            color: #000;
-        }
-
-        .btn-back {
-            background: #F59E0B;
-            color: #fff;
-        }
-
-        .btn-logout {
-            background: #EF4444;
-            color: #fff;
-        }
-
-        .btn-success {
-            background: #10B981;
-            color: #fff;
-        }
-
-        .btn-danger {
-            background: #EF4444;
-            color: #fff;
-        }
-
-        .btn-info {
-            background: #3B82F6;
-            color: #fff;
-        }
-
-        .login-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-        }
-
-        .login-box {
-            background: rgba(0,0,0,0.3);
-            padding: 40px;
-            border-radius: 30px;
-            border: 2px solid #FFD700;
-            box-shadow: 0 0 40px rgba(255, 215, 0, 0.3);
-            width: 100%;
-            max-width: 400px;
-        }
-
-        .input {
-            width: 100%;
-            padding: 15px;
-            margin-bottom: 20px;
-            border: 2px solid #FFD700;
-            border-radius: 15px;
-            background: #1F2937;
-            color: #fff;
-            font-size: 1rem;
-        }
-
-        .menu-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 30px;
-            margin-top: 40px;
-        }
-
-        .menu-item {
-            aspect-ratio: 1;
-            background: linear-gradient(135deg, #FFD700, #FFA500);
-            border-radius: 50%;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            transition: all 0.3s;
-            box-shadow: 0 0 30px rgba(255, 215, 0, 0.6);
-            border: none;
-            color: #000;
-            font-weight: bold;
-            font-size: 1.1rem;
-            opacity: 0.9;
-        }
-
-        .menu-item:hover {
-            transform: scale(1.1);
-            box-shadow: 0 0 50px rgba(255, 215, 0, 0.8);
-            opacity: 1;
-        }
-
-        .wheel-container {
-            display: flex;
-            flex-direction: column;
-                       padding: 20px;
-            max-width: 1200px;
-            margin: 0 auto;
+            min-height: calc(100vh - 80px); /* لترك مساحة في الأسفل */
         }
 
         .header {
@@ -610,18 +519,6 @@
             box-shadow: 0 0 20px rgba(239, 68, 68, 0.5);
         }
 
-        /* تأثيرات الاحتفال (confetti) */
-        @keyframes confetti-fall {
-            0% {
-                transform: translateY(-100vh) rotate(0deg);
-                opacity: 1;
-            }
-            100% {
-                transform: translateY(100vh) rotate(720deg);
-                opacity: 0;
-            }
-        }
-        
         /* شريط النتيجة */
         .result-banner {
             position: fixed;
@@ -639,6 +536,36 @@
             box-shadow: 0 0 30px rgba(255, 215, 0, 0.7);
             min-width: 300px;
             text-align: center;
+        }
+
+        /* أيقونة إنستغرام في أسفل الصفحة */
+        .footer-instagram {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: linear-gradient(135deg, #833AB4, #FD1D1D, #FCB045);
+            padding: 10px 20px;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(253, 29, 29, 0.5);
+            border: 2px solid #fff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .footer-instagram:hover {
+            transform: scale(1.05);
+            filter: brightness(1.2);
+        }
+
+        .footer-instagram span {
+            color: white;
+            font-weight: bold;
+            font-size: 1rem;
+            text-shadow: 0 0 5px rgba(0,0,0,0.5);
         }
     </style>
 </head>
@@ -672,7 +599,7 @@
             isSpinning: false,
             selectedPlayer: null,
             soundEnabled: true,
-            musicEnabled: false // متغير جديد لحالة الموسيقى
+            musicEnabled: false
         };
 
         // عنصر الصوت المخفي لصوت الدولاب الميكانيكي الجديد
@@ -686,8 +613,7 @@
         musicElement.id = 'background-music';
         musicElement.loop = true;
         musicElement.style.display = 'none';
-        // ⚠️ ⚠️ ⚠️ لتغيير رابط الموسيقى، عدّل السطر التالي ⚠️ ⚠️ ⚠️
-        musicElement.src = 'Interstellar.mp3'; // <--- السطر رقم 1: ضع رابط الأغنية هنا
+        musicElement.src = 'Interstellar.mp3';
         
         // مكان وضع Data URI للصوت الجديد
         const WHEEL_SOUND_DATA_URI = 'wheel-voice.mp3';
@@ -707,28 +633,25 @@
             }
         }
 
-        // دوال التحكم بالموسيقى - تعديلها لتبدأ من الصفر
+        // دوال التحكم بالموسيقى
         function toggleMusic() {
             const music = document.getElementById('background-music');
             
             if (!music) return;
             
             if (music.paused) {
-                // عند التشغيل: إعادة التعيين والبدء من الصفر
                 music.currentTime = 0;
                 music.play().catch(e => console.log('مشكلة في تشغيل الموسيقى:', e));
                 appData.musicEnabled = true;
             } else {
-                // عند الإيقاف: إيقاف مؤقت وإعادة التعيين
                 music.pause();
                 music.currentTime = 0;
                 appData.musicEnabled = false;
             }
             
-            // حفظ الحالة في LocalStorage
             localStorage.setItem('MahercoMusicEnabled', JSON.stringify(appData.musicEnabled));
             saveData();
-            render(); // إعادة العرض لتحديث الزر
+            render();
         }
 
         // دالة دمج البيانات بأمان
@@ -762,7 +685,6 @@
                     appData.soundEnabled = JSON.parse(savedSound);
                 }
                 
-                // تحميل حالة الموسيقى
                 const savedMusic = localStorage.getItem('MahercoMusicEnabled');
                 if (savedMusic !== null) {
                     appData.musicEnabled = JSON.parse(savedMusic);
@@ -794,7 +716,7 @@
                     notes: appData.notes,
                     siteName: appData.siteName,
                     soundEnabled: appData.soundEnabled,
-                    musicEnabled: appData.musicEnabled // حفظ حالة الموسيقى
+                    musicEnabled: appData.musicEnabled
                 };
                 localStorage.setItem('MahercoChallengesData', JSON.stringify(dataToSave));
                 
@@ -809,50 +731,58 @@
             }
         }
 
-        // النجوم اللامعة
+        // النيازك والنجوم
         function createSparkles() {
             setInterval(() => {
-                if (Math.random() > 0.6) {
-                    const star = document.createElement('div');
-                    star.className = 'star';
-                    star.style.left = Math.random() * 100 + '%';
-                    star.style.top = Math.random() * 100 + '%';
-                    star.style.width = (Math.random() * 4 + 3) + 'px';
-                    star.style.height = star.style.width;
-                    document.body.appendChild(star);
-                    
-                    setTimeout(() => star.remove(), 4000);
+                for (let i = 0; i < 3; i++) {
+                    if (Math.random() > 0.5) {
+                        setTimeout(() => {
+                            const star = document.createElement('div');
+                            star.className = 'star';
+                            star.style.left = Math.random() * 100 + '%';
+                            star.style.top = Math.random() * 100 + '%';
+                            star.style.width = (Math.random() * 6 + 4) + 'px';
+                            star.style.height = star.style.width;
+                            star.style.animationDuration = (Math.random() * 2 + 2) + 's';
+                            document.body.appendChild(star);
+                            
+                            setTimeout(() => star.remove(), 5000 + Math.random() * 3000);
+                        }, i * 200);
+                    }
                 }
-            }, 250);
+            }, 800);
         }
 
-        // دالة إنشاء تأثيرات احتفال
-        function createCelebrationEffect() {
-            const colors = ['#FFD700', '#FFA500', '#FFEB3B', '#3B82F6', '#EF4444', '#10B981'];
-            for (let i = 0; i < 50; i++) {
+        function createMeteorShower() {
+            const colors = [
+                'linear-gradient(to bottom, transparent, #FFD700, #FFA500)',
+                'linear-gradient(to bottom, transparent, #FF69B4, #FF1493)',
+                'linear-gradient(to bottom, transparent, #00FFFF, #0080FF)',
+                'linear-gradient(to bottom, transparent, #FF6347, #FF4500)',
+                'linear-gradient(to bottom, transparent, #9370DB, #8A2BE2)'
+            ];
+            
+            for (let i = 0; i < 15; i++) {
                 setTimeout(() => {
-                    const confetti = document.createElement('div');
-                    confetti.style.position = 'fixed';
-                    confetti.style.width = '10px';
-                    confetti.style.height = '10px';
-                    confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-                    confetti.style.left = Math.random() * 100 + '%';
-                    confetti.style.top = '-10px';
-                    confetti.style.zIndex = '999';
-                    confetti.style.borderRadius = '50%';
-                    confetti.style.pointerEvents = 'none';
-                    confetti.style.animation = 'confetti-fall 3s linear forwards';
+                    const meteor = document.createElement('div');
+                    meteor.className = 'meteor';
+                    meteor.style.left = Math.random() * 100 + '%';
+                    meteor.style.top = '-50px';
+                    meteor.style.animation = 'meteorFall 2s linear forwards';
+                    meteor.style.background = colors[Math.floor(Math.random() * colors.length)];
                     
-                    document.body.appendChild(confetti);
+                    const length = Math.random() * 80 + 40;
+                    meteor.style.setProperty('--tail-length', length + 'px');
+                    meteor.style.transform = `rotate(${Math.random() * 20 + 40}deg)`;
                     
-                    setTimeout(() => confetti.remove(), 3000);
-                }, i * 30);
+                    document.body.appendChild(meteor);
+                    
+                    setTimeout(() => meteor.remove(), 2000);
+                }, i * 150);
             }
         }
 
-        // دالة لعرض شريط النتيجة مع انميشن احتفال
         function showResultBanner(text, nextStep) {
-            // إنشاء شريط النتيجة
             const banner = document.createElement('div');
             banner.className = 'result-banner';
             banner.innerHTML = `
@@ -863,15 +793,13 @@
             `;
             document.body.appendChild(banner);
             
-            // انزلاق الشريط للأسفل
             setTimeout(() => {
                 banner.style.top = '20px';
             }, 100);
             
-            // إضافة تأثيرات احتفال
-            createCelebrationEffect();
+            createMeteorShower();
+            setTimeout(() => createMeteorShower(), 500);
             
-            // إزالة الشريط تلقائياً بعد 10 ثواني إذا لم ينقر المستخدم
             setTimeout(() => {
                 if (banner.parentNode) {
                     banner.remove();
@@ -894,7 +822,6 @@
         }
 
         function logout() {
-            // عند تسجيل الخروج، أوقف الموسيقى وإعادة تعيين
             const music = document.getElementById('background-music');
             if (music && !music.paused) {
                 music.pause();
@@ -973,7 +900,6 @@
         function renderWheel() {
             const hasIncompleteChallenges = appData.currentChallenges.length > 0;
             
-            // التحقق من وجود عناصر للدوران
             let missingItems = [];
             if (appData.games.length === 0) missingItems.push('ألعاب');
             if (appData.players.length === 0) missingItems.push('لاعبين');
@@ -1008,9 +934,7 @@
 
             let svg = `<svg viewBox="0 0 200 200" id="wheel">`;
             
-            // إصلاح مشكلة اللون الأسود عند وجود عنصر واحد فقط
             if (items.length === 1) {
-                // عند وجود عنصر واحد، ارسم دائرة كاملة باللون الأزرق والنص على الطرف
                 svg += `
                     <circle cx="100" cy="100" r="100" fill="#3B82F6" stroke="#000" stroke-width="2"/>
                     <text x="180" y="105" fill="white" font-size="12" font-weight="bold" text-anchor="end" dominant-baseline="middle">
@@ -1018,7 +942,6 @@
                     </text>
                 `;
             } else {
-                // الرسم العادي لعناصر متعددة
                 items.forEach((item, index) => {
                     const startAngle = index * segmentAngle - 90;
                     const endAngle = startAngle + segmentAngle;
@@ -1073,7 +996,6 @@
                 `;
             }
 
-            // التحقق من حالة التحدي لتحديد الرسالة والحالة
             const hasActiveChallenge = appData.currentChallenges.length > 0;
             const isChallengeInProgress = appData.currentChallenge !== null;
             
@@ -1081,11 +1003,9 @@
             let wheelDisabled = false;
             
             if (hasActiveChallenge) {
-                // يوجد تحدي حالي لم ينتهِ - تعطيل الدولاب
                 wheelMessage = '<div class="challenge-warning">⚠️ أنهِ التحدي الحالي لكي تستطيع بدء تحدي جديد</div>';
                 wheelDisabled = true;
             } else if (!isChallengeInProgress) {
-                // لا يوجد تحدي حالي ولم يبدأ تحدي جديد
                 wheelMessage = '<div class="start-challenge-text" onclick="startNewChallenge()">🎯 بدء تحدي</div>';
             }
 
@@ -1111,7 +1031,6 @@
         }
 
         function startNewChallenge() {
-            // بدء تحدي جديد: إعادة تعيين جميع البيانات
             appData.wheelStep = 'games';
             appData.selectedGame = null;
             appData.currentChallenge = null;
@@ -1123,12 +1042,10 @@
         }
 
         function spinWheel() {
-            // التحقق من وجود تحدي حالي لمنع الدوران
             if (appData.isSpinning || appData.currentChallenges.length > 0) {
-                return; // منع الدوران إذا كان هناك تحدي حالي أو العجلة تدور بالفعل
+                return;
             }
             
-            // تشغيل الصوت الجديد عند بدء الدوران
             playWheelSound();
             
             appData.isSpinning = true;
@@ -1140,14 +1057,12 @@
                 wheel.style.transform = `rotate(${appData.rotation}deg)`;
             }
             
-            // تعديل وقت الإنهاء إلى 6 ثواني (6000 مللي ثانية)
             setTimeout(() => {
                 appData.isSpinning = false;
                 handleWheelResult();
-            }, 6000); // تم تغيير من 3000 إلى 6000
+            }, 6000);
         }
 
-        // تعديل دالة handleWheelResult للتحقق من انتهاء التحدي تلقائياً
         function handleWheelResult() {
             const normalizedRotation = appData.rotation % 360;
             
@@ -1166,7 +1081,6 @@
                 appData.wheelStep = 'players';
                 appData.rotation = 0;
                 
-                // عرض شريط النتيجة
                 showResultBanner(`🎮 تم اختيار اللعبة: ${game}`, "appData.rotation = 0; saveData(); render();");
                 
             } else if (appData.wheelStep === 'players') {
@@ -1190,7 +1104,6 @@
                 appData.wheelStep = 'cards';
                 appData.rotation = 0;
                 
-                // عرض شريط النتيجة
                 showResultBanner(`👤 تم اختيار اللاعب: ${player.name}`, "appData.rotation = 0; saveData(); render();");
                 
             } else if (appData.wheelStep === 'cards') {
@@ -1207,9 +1120,7 @@
                 
                 appData.availableCards = appData.availableCards.filter(c => c !== card);
                 
-                // التحقق من انتهاء التحدي (آخر لاعب)
                 if (appData.availablePlayers.length === 0) {
-                    // إنهاء التحدي تلقائياً وحفظه
                     const challenge = {
                         ...appData.currentChallenge,
                         id: Date.now(),
@@ -1217,22 +1128,18 @@
                     };
                     appData.currentChallenges.push(challenge);
                     
-                    // عرض شريط نهائي
                     showResultBanner(`🎯 اكتمل التحدي! تم اختيار ${appData.currentChallenge.players.length} لاعبين`, "startNewChallenge();");
                 } else {
                     appData.wheelStep = 'players';
                     appData.rotation = 0;
                     
-                    // عرض شريط النتيجة
                     showResultBanner(`🃏 تم اختيار البطاقة: ${card}`, "appData.rotation = 0; saveData(); render();");
                 }
             }
             
             saveData();
-            // لا نستدعي render() هنا لأن الشريط يتولى الانتقال
         }
 
-        // التحديات الحالية
         function renderCurrentChallenges() {
             return `
                 <div class="container">
@@ -1569,7 +1476,6 @@
             goBack();
         }
 
-        // الإعدادات - مع إضافة خيار الموسيقى
         function renderSettings() {
             const settingsMenu = [
                 { label: 'إضافة أسماء الألعاب 🎮', page: 'manage-games' },
@@ -1600,7 +1506,6 @@
             `;
         }
 
-        // صفحة إعدادات الصوت - تعديلها لإضافة تحكم الموسيقى
         function renderSoundSettings() {
             return `
                 <div class="container">
@@ -1610,7 +1515,6 @@
                         <div></div>
                     </div>
                     
-                    <!-- إعدادات صوت الدولاب -->
                     <div class="card" style="max-width: 600px; margin: 0 auto 20px;">
                         <h3 class="card-title text-center">🔊 تفعيل/إلغاء صوت الدولاب</h3>
                         <div style="display: flex; justify-content: center; gap: 20px; margin: 30px 0;">
@@ -1632,7 +1536,6 @@
                         </p>
                     </div>
                     
-                    <!-- إعدادات الموسيقى الخلفية -->
                     <div class="card" style="max-width: 600px; margin: 0 auto;">
                         <h3 class="card-title text-center">🎵 الموسيقى الخلفية</h3>
                         <p class="text-center text-gray mb-4">تحكم في تشغيل الموسيقى الخلفية للموقع</p>
@@ -1849,9 +1752,8 @@
                 appData.currentChallenges = [];
                 appData.savedChallenges = [];
                 appData.notes = [];
-                appData.musicEnabled = false; // تصفير حالة الموسيقى
+                appData.musicEnabled = false;
                 
-                // إيقاف الموسيقى وإعادة تعيين
                 const music = document.getElementById('background-music');
                 if (music) {
                     music.pause();
@@ -2053,22 +1955,10 @@
             }
         }
 
-        // الرندر الرئيسي - تعديل: إزالة زر الموسيقى وإبقاء اسم المطور فقط
+        // الرندر الرئيسي - مع إضافة أيقونة إنستغرام أسفل الصفحة
         function render() {
             const app = document.getElementById('app');
             let content = '';
-            
-            // إضافة اسم المطور فقط (بدون زر الموسيقى)
-            const headerExtras = appData.currentUser ? `
-                <div style="position: fixed; top: 20px; left: 20px; z-index: 1000; display: flex; align-items: center; gap: 10px;">
-                    <div style="color: #FFD700; font-weight: bold; font-size: 1rem; text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);">
-                        تم التطوير بواسطة: Sally
-                        <a href="https://www.instagram.com/011sally?igsh=NTZqOGs0eGU5YXg2" target="_blank" style="color: #E1306C; margin-right: 5px; text-decoration: none; font-size: 1.2rem;">
-                            📷
-                        </a>
-                    </div>
-                </div>
-            ` : '';
             
             switch(appData.currentPage) {
                 case 'login':
@@ -2129,7 +2019,26 @@
                     content = renderLogin();
             }
             
-            app.innerHTML = headerExtras + content;
+            // إضافة أيقونة إنستغرام في أسفل الصفحة لجميع الصفحات
+            const instagramFooter = `
+                <div class="footer-instagram" onclick="window.open('https://www.instagram.com/011sally?igsh=NTZqOGs0eGU5YXg2', '_blank')">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="2" y="2" width="20" height="20" rx="5" fill="white"/>
+                        <circle cx="12" cy="12" r="4" fill="url(#instagram-gradient)"/>
+                        <circle cx="18" cy="6" r="1.5" fill="white"/>
+                        <defs>
+                            <linearGradient id="instagram-gradient" x1="2" y1="22" x2="22" y2="2" gradientUnits="userSpaceOnUse">
+                                <stop stop-color="#833AB4"/>
+                                <stop offset="0.5" stop-color="#FD1D1D"/>
+                                <stop offset="1" stop-color="#FCB045"/>
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                    <span>المطورة Sally</span>
+                </div>
+            `;
+            
+            app.innerHTML = content + instagramFooter;
             
             // إضافة عناصر الصوت إلى DOM
             if (!document.getElementById('wheel-audio')) {
@@ -2140,7 +2049,7 @@
                 document.body.appendChild(musicElement);
             }
             
-            // 🎵 عند تسجيل الدخول، إذا كانت الموسيقى مفعّلة، شغّلها
+            // تشغيل الموسيقى تلقائياً عند تسجيل الدخول
             if (appData.currentUser && appData.musicEnabled) {
                 const music = document.getElementById('background-music');
                 if (music && music.paused) {
@@ -2148,12 +2057,11 @@
                 }
             }
             
-            // إضافة حدث النقر للعجلة فقط إذا كانت غير معطلة
+            // إضافة حدث النقر للعجلة
             if (appData.currentPage === 'wheel') {
                 setTimeout(() => {
                     const wheel = document.getElementById('wheel');
                     if (wheel && appData.currentChallenges.length === 0) {
-                        // إضافة الحدث فقط إذا لم يكن هناك تحدي حالي
                         wheel.addEventListener('click', spinWheel);
                     }
                 }, 100);
