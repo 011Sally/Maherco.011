@@ -568,49 +568,8 @@
             text-shadow: 0 0 5px rgba(0,0,0,0.5);
         }
     </style>
-    <!-- Firebase -->
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-  import { getFirestore } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-  import { getAuth } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-
-  const firebaseConfig = {
-    apiKey: "AIzaSyDyBsXoCyaH-70W-FbxKAaU4jA_wm_l4Fc",
-    authDomain: "maherco-web.firebaseapp.com",
-    projectId: "maherco-web",
-    storageBucket: "maherco-web.firebasestorage.app",
-    messagingSenderId: "736330076471",
-    appId: "1:736330076471:web:a70360252496d67a95cab2"
-  };
-
-  window.firebaseApp = initializeApp(firebaseConfig);
-  window.db = getFirestore(firebaseApp);
-  window.auth = getAuth(firebaseApp);
-</script>
-
 </head>
 <body>
-  <h2 style="color:red; text-align:center;">
-    <h2>➕ إضافة لاعب جديد</h2>
-
-<input
-  id="player-name"
-  type="text"
-  placeholder="اسم اللاعب"
-  style="padding:8px; width:200px;"
-/>
-
-<button id="add-player" style="padding:8px;">
-  إضافة
-</button>
-
-<hr>
-
-  👇 قائمة اللاعبين (اختبار)
-</h2>
-
-<div id="players-output" style="padding:10px; font-family:monospace; color:black; background:#eee;"></div>
-
     <div id="app"></div>
 
     <script>
@@ -2125,53 +2084,5 @@
             `;
         }
     </script>
-<div id="players-output" style="padding:10px; font-family:monospace;"></div>
-
-<script type="module">
-  import {
-    collection,
-    getDocs,
-    addDoc
-  } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-  const output = document.getElementById("players-output");
-  const input = document.getElementById("player-name");
-  const button = document.getElementById("add-player");
-
-  async function loadPlayers() {
-    output.innerHTML = "جارٍ تحميل اللاعبين...";
-    const querySnapshot = await getDocs(collection(window.db, "players"));
-    output.innerHTML = "";
-
-    querySnapshot.forEach((doc) => {
-      const data = doc.data();
-      output.innerHTML += `
-        <div>
-          🧑 الاسم: ${data.name} <br>
-          ⭐ النقاط: ${data.points}
-          <hr>
-        </div>
-      `;
-    });
-  }
-
-  button.addEventListener("click", async () => {
-    const name = input.value.trim();
-    if (!name) return alert("اكتب اسم اللاعب");
-
-    await addDoc(collection(window.db, "players"), {
-      name: name,
-      points: 0,
-      createdAt: new Date()
-    });
-
-    input.value = "";
-    loadPlayers();
-  });
-
-  loadPlayers();
-</script>
-
-
 </body>
 </html>
