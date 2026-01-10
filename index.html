@@ -591,6 +591,21 @@
 </head>
 <body>
   <h2 style="color:red; text-align:center;">
+    <h2>➕ إضافة لاعب جديد</h2>
+
+<input
+  id="player-name"
+  type="text"
+  placeholder="اسم اللاعب"
+  style="padding:8px; width:200px;"
+/>
+
+<button id="add-player" style="padding:8px;">
+  إضافة
+</button>
+
+<hr>
+
   👇 قائمة اللاعبين (اختبار)
 </h2>
 
@@ -2113,32 +2128,50 @@
 <div id="players-output" style="padding:10px; font-family:monospace;"></div>
 
 <script type="module">
-  import { collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+  import {
+    collection,
+    getDocs,
+    addDoc
+  } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-  document.addEventListener("DOMContentLoaded", async () => {
-    const output = document.getElementById("players-output");
+  const output = document.getElementById("players-output");
+  const input = document.getElementById("player-name");
+  const button = document.getElementById("add-player");
+
+  async function loadPlayers() {
     output.innerHTML = "جارٍ تحميل اللاعبين...";
+    const querySnapshot = await getDocs(collection(window.db, "players"));
+    output.innerHTML = "";
 
-    try {
-      const querySnapshot = await getDocs(collection(window.db, "players"));
-      output.innerHTML = "";
+    querySnapshot.forEach((doc) => {
+      const data = doc.data();
+      output.innerHTML += `
+        <div>
+          🧑 الاسم: ${data.name} <br>
+          ⭐ النقاط: ${data.points}
+          <hr>
+        </div>
+      `;
+    });
+  }
 
-      querySnapshot.forEach((doc) => {
-        const data = doc.data();
-        output.innerHTML += `
-          <div>
-            🧑 الاسم: ${data.name} <br>
-            ⭐ النقاط: ${data.points}
-            <hr>
-          </div>
-        `;
-      });
+  button.addEventListener("click", async () => {
+    const name = input.value.trim();
+    if (!name) return alert("اكتب اسم اللاعب");
 
-    } catch (e) {
-      output.innerHTML = "❌ خطأ في جلب البيانات";
-    }
+    await addDoc(collection(window.db, "players"), {
+      name: name,
+      points: 0,
+      createdAt: new Date()
+    });
+
+    input.value = "";
+    loadPlayers();
   });
+
+  loadPlayers();
 </script>
+
 
 </body>
 </html>
