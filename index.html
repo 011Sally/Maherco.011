@@ -2104,18 +2104,32 @@
             `;
         }
     </script>
-    
-    <script type="module">
+<div id="players-output" style="padding:10px; font-family:monospace;"></div>
+
+<script type="module">
   import { collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
   document.addEventListener("DOMContentLoaded", async () => {
+    const output = document.getElementById("players-output");
+    output.innerHTML = "جارٍ تحميل اللاعبين...";
+
     try {
       const querySnapshot = await getDocs(collection(window.db, "players"));
+      output.innerHTML = "";
+
       querySnapshot.forEach((doc) => {
-        console.log("Player:", doc.id, doc.data());
+        const data = doc.data();
+        output.innerHTML += `
+          <div>
+            🧑 الاسم: ${data.name} <br>
+            ⭐ النقاط: ${data.points}
+            <hr>
+          </div>
+        `;
       });
+
     } catch (e) {
-      console.error("Firestore read error:", e);
+      output.innerHTML = "❌ خطأ في جلب البيانات";
     }
   });
 </script>
