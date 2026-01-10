@@ -538,7 +538,7 @@
             text-align: center;
         }
 
-        /* أيقونة إنستغرام في أسفل الصفحة */
+        /* أيقونة إنستغرام  */
         .footer-instagram {
             position: fixed;
             bottom: 20px;
@@ -579,13 +579,13 @@
             currentPage: 'login',
             pageHistory: [],
             siteName:'maherco',
-            games: ['Cs2'],
+            games: [],
             players: [
-                { id: 1, name: 'Maherco', points: 0, challenges: 0, cards: 0, instagram: '', challengeHistory: [] }
+                { id: 1, name: 'player', points: 0, challenges: 0, cards: 0, instagram: '', challengeHistory: [] }
             ],
-            cards: ['X2'],
+            cards: [],
             users: [
-                { id: 1, username: 'Sally', password: '013799', type: 'admin', createdAt: new Date().toISOString() }
+                { id: 1, username: 'Maherco', password: '709030', type: 'admin', createdAt: new Date().toISOString() }
             ],
             currentChallenges: [],
             savedChallenges: [],
@@ -602,20 +602,20 @@
             musicEnabled: false
         };
 
-        // عنصر الصوت المخفي لصوت الدولاب الميكانيكي الجديد
+        // عنصر الصوت 
         const audioElement = document.createElement('audio');
         audioElement.id = 'wheel-audio';
         audioElement.preload = 'auto';
         audioElement.style.display = 'none';
         
-        // عنصر الصوت للموسيقى الخلفية
+        // عنصر الصوت للخلفية
         const musicElement = document.createElement('audio');
         musicElement.id = 'background-music';
         musicElement.loop = true;
         musicElement.style.display = 'none';
         musicElement.src = 'Interstellar.mp3';
         
-        // مكان وضع Data URI للصوت الجديد
+        // مكان وضع الصوت
         const WHEEL_SOUND_DATA_URI = 'wheel-voice.mp3';
         
         // دالة تشغيل صوت الدولاب الجديد
@@ -654,7 +654,7 @@
             render();
         }
 
-        // دالة دمج البيانات بأمان
+        // البيانات
         function safeMerge(target, source) {
             if (!source || typeof source !== 'object') return;
             
@@ -1955,7 +1955,7 @@
             }
         }
 
-        // الرندر الرئيسي - مع إضافة أيقونة إنستغرام أسفل الصفحة
+        // الرندر الرئيسي
         function render() {
             const app = document.getElementById('app');
             let content = '';
@@ -2019,7 +2019,7 @@
                     content = renderLogin();
             }
             
-            // إضافة أيقونة إنستغرام في أسفل الصفحة لجميع الصفحات
+            // إضافة أيقونة إنستغرام
             const instagramFooter = `
                 <div class="footer-instagram" onclick="window.open('https://www.instagram.com/011sally?igsh=NTZqOGs0eGU5YXg2', '_blank')">
                     <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
