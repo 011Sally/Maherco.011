@@ -568,6 +568,26 @@
             text-shadow: 0 0 5px rgba(0,0,0,0.5);
         }
     </style>
+    <!-- Firebase -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getFirestore } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+  import { getAuth } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyAFnNLUYGeB2hZRj9qNyzzN1kBg9_GCLX4",
+    authDomain: "maherco-challenges-4b5a5.firebaseapp.com",
+    projectId: "maherco-challenges-4b5a5",
+    storageBucket: "maherco-challenges-4b5a5.firebasestorage.app",
+    messagingSenderId: "417329658328",
+    appId: "1:417329658328:web:f871bb5e99ea7ba8b85aad"
+  };
+
+  window.firebaseApp = initializeApp(firebaseConfig);
+  window.db = getFirestore(firebaseApp);
+  window.auth = getAuth(firebaseApp);
+</script>
+
 </head>
 <body>
     <div id="app"></div>
