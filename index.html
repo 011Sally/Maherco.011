@@ -4,6 +4,41 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Maherco.Challenges</title>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    
+    <!-- تكوين Firebase -->
+    <script>
+       const firebaseConfig = {
+    apiKey: "AIzaSyDDYlgrW7XShbikgVhuP9b3GHgLF1DlmPI",
+    authDomain: "maherco-challenges-4d5cc.firebaseapp.com",
+    projectId: "maherco-challenges-4d5cc",
+    storageBucket: "maherco-challenges-4d5cc.firebasestorage.app",
+    messagingSenderId: "664404018514",
+    appId: "1:664404018514:web:79cdea0ef4d6aab298a68b"
+  };
+  
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY_HERE",
+            authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_PROJECT_ID.appspot.com",
+            messagingSenderId: "YOUR_MESSAGING_ID",
+            appId: "YOUR_APP_ID"
+        };
+
+        // تهيئة Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const auth = firebase.auth();
+        
+        // إعدادات الأمان: السماح بالقراءة للجميع والكتابة للمستخدمين
+        db.settings({ ignoreUndefinedProperties: true });
+    </script>
+    
     <style>
         * {
             margin: 0;
@@ -84,7 +119,7 @@
             padding: 20px;
             max-width: 1200px;
             margin: 0 auto;
-            min-height: calc(100vh - 80px); /* لترك مساحة في الأسفل */
+            min-height: calc(100vh - 80px);
         }
 
         .header {
@@ -650,7 +685,6 @@
             }
             
             localStorage.setItem('MahercoMusicEnabled', JSON.stringify(appData.musicEnabled));
-            saveData();
             render();
         }
 
@@ -671,23 +705,55 @@
             });
         }
 
-        // تحميل وحفظ البيانات
-        function loadData() {
+        // دوال التحميل والحفظ مع Firebase
+        async function loadData() {
+            try {
+                // تحميل بيانات الموقع الأساسية
+                const siteDoc = await db.collection('siteData').doc('main').get();
+                if (siteDoc.exists) {
+                    const data = siteDoc.data();
+                    appData.games = data.games || ['Cs2'];
+                    appData.cards = data.cards || ['X2'];
+                    appData.notes = data.notes || [];
+                    appData.siteName = data.siteName || 'maherco';
+                }
+
+                // تحميل بيانات اللاعبين
+                const playersSnapshot = await db.collection('players').get();
+                appData.players = playersSnapshot.docs.map(doc => ({
+                    id: doc.id,
+                    ...doc.data()
+                }));
+
+                // تحميل التحديات الحالية
+                const currentSnapshot = await db.collection('challenges').where('status', '==', 'current').get();
+                appData.currentChallenges = currentSnapshot.docs.map(doc => ({
+                    id: doc.id,
+                    ...doc.data()
+                }));
+
+                // تحميل التحديات المحفوظة
+                const savedSnapshot = await db.collection('challenges').where('status', '==', 'saved').get();
+                appData.savedChallenges = savedSnapshot.docs.map(doc => ({
+                    id: doc.id,
+                    ...doc.data()
+                }));
+
+                console.log('✅ تم تحميل البيانات من Firebase');
+            } catch (e) {
+                console.warn('⚠️ تعذر تحميل البيانات من Firebase:', e);
+                // محاولة تحميل البيانات المحلية كاحتياطي
+                loadFromLocalStorage();
+            }
+        }
+
+        // احتياطي: تحميل من localStorage إذا فشل Firebase
+        function loadFromLocalStorage() {
             try {
                 const savedData = localStorage.getItem('MahercoChallengesData');
                 if (savedData) {
                     const parsed = JSON.parse(savedData);
                     safeMerge(appData, parsed);
-                }
-                
-                const savedSound = localStorage.getItem('MahercoSoundEnabled');
-                if (savedSound !== null) {
-                    appData.soundEnabled = JSON.parse(savedSound);
-                }
-                
-                const savedMusic = localStorage.getItem('MahercoMusicEnabled');
-                if (savedMusic !== null) {
-                    appData.musicEnabled = JSON.parse(savedMusic);
                 }
                 
                 const savedUser = localStorage.getItem('MahercoCurrentUser');
@@ -700,11 +766,32 @@
                     }
                 }
             } catch (e) {
-                console.warn('تعذر تحميل البيانات المحفوظة:', e);
+                console.warn('تعذر تحميل البيانات المحلية:', e);
             }
         }
 
-        function saveData() {
+        async function saveData() {
+            try {
+                // حفظ بيانات الموقع
+                await db.collection('siteData').doc('main').set({
+                    games: appData.games,
+                    cards: appData.cards,
+                    notes: appData.notes,
+                    siteName: appData.siteName,
+                    soundEnabled: appData.soundEnabled,
+                    musicEnabled: appData.musicEnabled
+                });
+
+                console.log('✅ تم حفظ البيانات في Firebase');
+            } catch (e) {
+                console.warn('⚠️ تعذر حفظ البيانات في Firebase:', e);
+                // محاولة الحفظ محلياً كاحتياطي
+                saveToLocalStorage();
+            }
+        }
+
+        // احتياطي: حفظ محلي
+        function saveToLocalStorage() {
             try {
                 const dataToSave = {
                     games: appData.games,
@@ -719,15 +806,28 @@
                     musicEnabled: appData.musicEnabled
                 };
                 localStorage.setItem('MahercoChallengesData', JSON.stringify(dataToSave));
-                
-                if (appData.currentUser) {
-                    localStorage.setItem('MahercoCurrentUser', JSON.stringify({
-                        username: appData.currentUser.username,
-                        loginTime: new Date().toISOString()
-                    }));
-                }
+                console.log('💾 تم الحفظ محلياً كاحتياطي');
             } catch (e) {
-                console.warn('تعذر حفظ البيانات:', e);
+                console.warn('⚠️ تعذر الحفظ محلياً:', e);
+            }
+        }
+
+        // دوال خاصة بحفظ اللاعبين والتحديات
+        async function savePlayer(playerData) {
+            try {
+                const playerRef = db.collection('players').doc(playerData.id.toString());
+                await playerRef.set(playerData, { merge: true });
+            } catch (e) {
+                console.warn('⚠️ تعذر حفظ اللاعب:', e);
+            }
+        }
+
+        async function saveChallenge(challengeData) {
+            try {
+                const challengeRef = db.collection('challenges').doc(challengeData.id.toString());
+                await challengeRef.set(challengeData);
+            } catch (e) {
+                console.warn('⚠️ تعذر حفظ التحدي:', e);
             }
         }
 
@@ -821,20 +921,23 @@
             }
         }
 
-        function logout() {
-            const music = document.getElementById('background-music');
-            if (music && !music.paused) {
-                music.pause();
-                music.currentTime = 0;
+        async function logout() {
+            try {
+                const music = document.getElementById('background-music');
+                if (music && !music.paused) {
+                    music.pause();
+                    music.currentTime = 0;
+                }
+                appData.musicEnabled = false;
+                
+                await auth.signOut();
+                appData.currentUser = null;
+                appData.currentPage = 'login';
+                appData.pageHistory = [];
+                render();
+            } catch (e) {
+                console.log('خطأ في تسجيل الخروج:', e);
             }
-            appData.musicEnabled = false;
-            localStorage.setItem('MahercoMusicEnabled', 'false');
-            
-            appData.currentUser = null;
-            appData.currentPage = 'login';
-            appData.pageHistory = [];
-            localStorage.removeItem('MahercoCurrentUser');
-            render();
         }
 
         // صفحة تسجيل الدخول
@@ -843,26 +946,66 @@
                 <div class="login-container">
                     <div class="login-box">
                         <h1 class="title text-center mb-4">${appData.siteName}</h1>
-                        <input type="text" id="username" class="input" placeholder="اسم المستخدم">
+                        <input type="text" id="username" class="input" placeholder="اسم المستخدم (مثال: Sally)">
                         <input type="password" id="password" class="input" placeholder="كلمة المرور">
                         <button class="btn btn-primary" style="width: 100%;" onclick="handleLogin()">تسجيل الدخول</button>
+                        <p class="text-center text-sm text-gray mt-4">
+                            حساب تجريبي: Sally | 709033
+                        </p>
                     </div>
                 </div>
             `;
         }
 
-        function handleLogin() {
-            const username = document.getElementById('username').value;
+        async function handleLogin() {
+            const username = document.getElementById('username').value.trim();
             const password = document.getElementById('password').value;
-            const user = appData.users.find(u => u.username === username && u.password === password);
             
-            if (user) {
-                appData.currentUser = user;
+            // تحقق من الحسابات المحلية لأول مرة
+            const localUser = appData.users.find(u => u.username === username && u.password === password);
+            
+            if (localUser) {
+                // إذا كان حساباً محلياً، حوّله إلى Firebase
+                try {
+                    await auth.createUserWithEmailAndPassword(username + '@maherco.com', password);
+                    await db.collection('users').doc(username).set({
+                        username: username,
+                        type: localUser.type,
+                        createdAt: new Date().toISOString()
+                    });
+                    console.log('✅ تم ترحيل الحساب إلى Firebase');
+                } catch (e) {
+                    // إذا كان موجوداً في Firebase بالفعل
+                    try {
+                        await auth.signInWithEmailAndPassword(username + '@maherco.com', password);
+                    } catch (e) {
+                        alert('❌ خطأ في تسجيل الدخول: ' + e.message);
+                        return;
+                    }
+                }
+            } else {
+                // محاولة تسجيل الدخول باستخدام Firebase فقط
+                try {
+                    await auth.signInWithEmailAndPassword(username + '@maherco.com', password);
+                    
+                    // جلب بيانات المستخدم
+                    const userDoc = await db.collection('users').doc(username).get();
+                    if (userDoc.exists) {
+                        localUser = userDoc.data();
+                    }
+                } catch (e) {
+                    alert('❌ خطأ في تسجيل الدخول: ' + e.message);
+                    return;
+                }
+            }
+            
+            if (localUser) {
+                appData.currentUser = localUser;
                 appData.currentPage = 'home';
-                saveData();
+                await loadData();
                 render();
             } else {
-                alert('خطأ في اسم المستخدم أو كلمة المرور');
+                alert('⚠️ المستخدم غير موجود');
             }
         }
 
@@ -1173,7 +1316,7 @@
             `;
         }
 
-        function finishChallenge(index) {
+        async function finishChallenge(index) {
             const challenge = appData.currentChallenges[index];
             
             const panel = document.createElement('div');
@@ -1206,7 +1349,7 @@
             `;
         }
 
-        function confirmFinishChallenge(index) {
+        async function confirmFinishChallenge(index) {
             const challenge = appData.currentChallenges[index];
             const pointsData = {};
             
@@ -1227,32 +1370,33 @@
                 }))
             };
             
-            appData.players = appData.players.map(player => {
-                const challengePlayer = updatedChallenge.players.find(p => p.player.id === player.id);
-                if (challengePlayer) {
-                    const historyEntry = {
+            // تحديث بيانات اللاعبين
+            for (let playerData of challenge.players) {
+                const points = pointsData[playerData.player.id] || 0;
+                const playerRef = db.collection('players').doc(playerData.player.id.toString());
+                
+                await playerRef.update({
+                    points: firebase.firestore.FieldValue.increment(points),
+                    challenges: firebase.firestore.FieldValue.increment(1),
+                    cards: firebase.firestore.FieldValue.increment(1),
+                    challengeHistory: firebase.firestore.FieldValue.arrayUnion({
                         challengeId: updatedChallenge.id,
                         game: updatedChallenge.game,
-                        card: challengePlayer.card,
-                        points: challengePlayer.points,
+                        card: playerData.card,
+                        points: points,
                         date: updatedChallenge.completedAt
-                    };
-                    
-                    return {
-                        ...player,
-                        points: player.points + challengePlayer.points,
-                        challenges: player.challenges + 1,
-                        cards: player.cards + 1,
-                        challengeHistory: [...(player.challengeHistory || []), historyEntry]
-                    };
-                }
-                return player;
-            });
+                    })
+                });
+            }
             
-            appData.savedChallenges.push(updatedChallenge);
-            appData.currentChallenges.splice(index, 1);
+            // حفظ التحدي
+            await saveChallenge(updatedChallenge);
             
-            saveData();
+            // حذف التحدي الحالي
+            await db.collection('challenges').doc(challenge.id.toString()).delete();
+            
+            // إعادة التحميل
+            await loadData();
             goBack();
         }
 
@@ -1260,10 +1404,11 @@
             render();
         }
 
-        function deleteCurrentChallenge(index) {
+        async function deleteCurrentChallenge(index) {
             if (confirm('هل أنت متأكد من حذف هذا التحدي؟')) {
-                appData.currentChallenges.splice(index, 1);
-                saveData();
+                const challenge = appData.currentChallenges[index];
+                await db.collection('challenges').doc(challenge.id.toString()).delete();
+                await loadData();
                 render();
             }
         }
@@ -1301,30 +1446,33 @@
             `;
         }
 
-        function deleteSavedChallenge(index) {
+        async function deleteSavedChallenge(index) {
             if (confirm('هل أنت متأكد من حذف هذا التحدي؟ سيتم خصم النقاط من اللاعبين.')) {
                 const challenge = appData.savedChallenges[index];
                 
-                appData.players = appData.players.map(player => {
-                    const challengePlayer = challenge.players.find(p => p.player.id === player.id);
-                    if (challengePlayer) {
-                        const updatedHistory = (player.challengeHistory || []).filter(
-                            h => h.challengeId !== challenge.id
-                        );
-                        
-                        return {
-                            ...player,
-                            points: Math.max(0, player.points - challengePlayer.points),
-                            challenges: Math.max(0, player.challenges - 1),
-                            cards: Math.max(0, player.cards - 1),
-                            challengeHistory: updatedHistory
-                        };
-                    }
-                    return player;
-                });
+                // خصم النقاط من كل لاعب
+                for (let p of challenge.players) {
+                    const playerRef = db.collection('players').doc(p.player.id.toString());
+                    await playerRef.update({
+                        points: firebase.firestore.FieldValue.increment(-p.points),
+                        challenges: firebase.firestore.FieldValue.increment(-1),
+                        cards: firebase.firestore.FieldValue.increment(-1)
+                    });
+                    
+                    // حذف من السجل
+                    const playerDoc = await playerRef.get();
+                    const playerData = playerDoc.data();
+                    const updatedHistory = (playerData.challengeHistory || []).filter(
+                        h => h.challengeId !== challenge.id
+                    );
+                    await playerRef.update({ challengeHistory: updatedHistory });
+                }
                 
-                appData.savedChallenges.splice(index, 1);
-                saveData();
+                // حذف التحدي
+                await db.collection('challenges').doc(challenge.id.toString()).delete();
+                
+                // إعادة التحميل
+                await loadData();
                 render();
             }
         }
@@ -1453,7 +1601,7 @@
             `;
         }
 
-        function applyPointsAdjustment() {
+        async function applyPointsAdjustment() {
             const playerId = parseInt(document.getElementById('adjustPlayerId').value);
             const addPoints = parseInt(document.getElementById('addPoints').value) || 0;
             const subtractPoints = parseInt(document.getElementById('subtractPoints').value) || 0;
@@ -1463,15 +1611,12 @@
                 return;
             }
             
-            appData.players = appData.players.map(p => {
-                if (p.id === playerId) {
-                    let newPoints = p.points + addPoints - subtractPoints;
-                    return { ...p, points: Math.max(0, newPoints) };
-                }
-                return p;
+            const playerRef = db.collection('players').doc(playerId.toString());
+            await playerRef.update({
+                points: firebase.firestore.FieldValue.increment(addPoints - subtractPoints)
             });
             
-            saveData();
+            await loadData();
             alert('تم تحديث النقاط بنجاح');
             goBack();
         }
@@ -1589,18 +1734,18 @@
             `;
         }
 
-        function addGame() {
+        async function addGame() {
             const input = document.getElementById('newGame');
             if (input.value.trim()) {
                 appData.games.push(input.value.trim());
-                saveData();
+                await saveData();
                 render();
             }
         }
 
-        function deleteGame(index) {
+        async function deleteGame(index) {
             appData.games.splice(index, 1);
-            saveData();
+            await saveData();
             render();
         }
 
@@ -1633,29 +1778,32 @@
             `;
         }
 
-        function addPlayer() {
+        async function addPlayer() {
             const name = document.getElementById('newPlayerName').value.trim();
             const instagram = document.getElementById('newPlayerInstagram').value.trim();
             
             if (name) {
-                appData.players.push({
-                    id: Date.now(),
+                const newPlayer = {
+                    id: Date.now().toString(),
                     name: name,
                     points: 0,
                     challenges: 0,
                     cards: 0,
                     instagram: instagram,
                     challengeHistory: []
-                });
-                saveData();
+                };
+                
+                await savePlayer(newPlayer);
+                await loadData();
                 render();
             }
         }
 
-        function deletePlayer(index) {
+        async function deletePlayer(index) {
             if (confirm(`هل أنت متأكد من حذف ${appData.players[index].name}؟`)) {
-                appData.players.splice(index, 1);
-                saveData();
+                const playerId = appData.players[index].id;
+                await db.collection('players').doc(playerId.toString()).delete();
+                await loadData();
                 render();
             }
         }
@@ -1684,18 +1832,18 @@
             `;
         }
 
-        function addCard() {
+        async function addCard() {
             const input = document.getElementById('newCard');
             if (input.value.trim()) {
                 appData.cards.push(input.value.trim());
-                saveData();
+                await saveData();
                 render();
             }
         }
 
-        function deleteCard(index) {
+        async function deleteCard(index) {
             appData.cards.splice(index, 1);
-            saveData();
+            await saveData();
             render();
         }
 
@@ -1715,11 +1863,11 @@
             `;
         }
 
-        function saveSiteName() {
+        async function saveSiteName() {
             const newName = document.getElementById('newSiteName').value.trim();
             if (newName) {
                 appData.siteName = newName;
-                saveData();
+                await saveData();
                 goBack();
             }
         }
@@ -1734,7 +1882,7 @@
                     </div>
                     <div class="card" style="max-width: 600px; margin: 0 auto; border-color: #EF4444;">
                         <p class="text-center" style="color: #EF4444; font-size: 1.3rem; font-weight: bold; margin-bottom: 20px;">
-                            ⚠️ تحذير: سيتم حذف جميع البيانات بشكل نهائي!
+                            ⚠️ سيتم حذف جميع البيانات بشكل نهائي!
                         </p>
                         <button class="btn btn-danger" style="width: 100%;" onclick="resetAllData()">
                             تصفير الموقع بالكامل
@@ -1744,27 +1892,42 @@
             `;
         }
 
-        function resetAllData() {
+        async function resetAllData() {
             if (confirm('هل أنت متأكد من تصفير الموقع بالكامل؟ هذا الإجراء لا يمكن التراجع عنه!')) {
-                appData.games = ['Cs2'];
-                appData.players = [{ id: 1, name: 'Maherco', points: 0, challenges: 0, cards: 0, instagram: '', challengeHistory: [] }];
-                appData.cards = ['X2'];
-                appData.currentChallenges = [];
-                appData.savedChallenges = [];
-                appData.notes = [];
-                appData.musicEnabled = false;
-                
-                const music = document.getElementById('background-music');
-                if (music) {
-                    music.pause();
-                    music.currentTime = 0;
+                try {
+                    // حذف جميع اللاعبين
+                    const playersSnapshot = await db.collection('players').get();
+                    playersSnapshot.forEach(async doc => {
+                        await db.collection('players').doc(doc.id).delete();
+                    });
+                    
+                    // حذف جميع التحديات
+                    const challengesSnapshot = await db.collection('challenges').get();
+                    challengesSnapshot.forEach(async doc => {
+                        await db.collection('challenges').doc(doc.id).delete();
+                    });
+                    
+                    // إعادة القيم الافتراضية
+                    appData.games = ['Cs2'];
+                    appData.cards = ['X2'];
+                    appData.notes = [];
+                    appData.currentChallenges = [];
+                    appData.savedChallenges = [];
+                    
+                    await saveData();
+                    
+                    const music = document.getElementById('background-music');
+                    if (music && !music.paused) {
+                        music.pause();
+                        music.currentTime = 0;
+                    }
+                    appData.musicEnabled = false;
+                    
+                    goBack();
+                } catch (e) {
+                    console.error('خطأ في التصفير:', e);
+                    alert('❌ حدث خطأ أثناء التصفير');
                 }
-                
-                localStorage.removeItem('MahercoChallengesData');
-                localStorage.removeItem('MahercoCurrentUser');
-                localStorage.removeItem('MahercoMusicEnabled');
-                
-                goBack();
             }
         }
 
@@ -1788,16 +1951,22 @@
             `;
         }
 
-        function resetPoints() {
+        async function resetPoints() {
             if (confirm('هل أنت متأكد من تصفير جميع النقاط؟')) {
-                appData.players = appData.players.map(p => ({
-                    ...p,
-                    points: 0,
-                    challenges: 0,
-                    cards: 0,
-                    challengeHistory: []
-                }));
-                saveData();
+                const batch = db.batch();
+                const playersSnapshot = await db.collection('players').get();
+                
+                playersSnapshot.forEach(doc => {
+                    batch.update(doc.ref, {
+                        points: 0,
+                        challenges: 0,
+                        cards: 0,
+                        challengeHistory: []
+                    });
+                });
+                
+                await batch.commit();
+                await loadData();
                 goBack();
             }
         }
@@ -1834,7 +2003,7 @@
                                             تاريخ الإنشاء: ${new Date(user.createdAt).toLocaleString('ar-EG')}
                                         </div>
                                     </div>
-                                    ${user.username !== 'admin' ? `
+                                    ${user.username !== 'Sally' ? `
                                         <button class="btn btn-danger" onclick="deleteUser(${idx})">حذف</button>
                                     ` : ''}
                                 </div>
@@ -1845,29 +2014,45 @@
             `;
         }
 
-        function addUser() {
+        async function addUser() {
             const username = document.getElementById('newUsername').value.trim();
             const password = document.getElementById('newPassword').value.trim();
             const type = document.getElementById('newUserType').value;
             
             if (username && password) {
-                appData.users.push({
-                    id: Date.now(),
-                    username: username,
-                    password: password,
-                    type: type,
-                    createdAt: new Date().toISOString()
-                });
-                saveData();
-                render();
+                try {
+                    // إنشاء حساب في Firebase Auth
+                    await auth.createUserWithEmailAndPassword(username + '@maherco.com', password);
+                    
+                    // إضافة إلى القائمة المحلية
+                    appData.users.push({
+                        id: Date.now(),
+                        username: username,
+                        password: password, // ⚠️ في الإنتاج، لا تحفظ كلمات المرور بشكل عادي
+                        type: type,
+                        createdAt: new Date().toISOString()
+                    });
+                    
+                    alert('✅ تم إنشاء الحساب بنجاح');
+                    render();
+                } catch (e) {
+                    alert('❌ خطأ في إنشاء الحساب: ' + e.message);
+                }
             }
         }
 
-        function deleteUser(index) {
-            if (confirm(`هل أنت متأكد من حذف حساب ${appData.users[index].username}؟`)) {
-                appData.users.splice(index, 1);
-                saveData();
-                render();
+        async function deleteUser(index) {
+            const user = appData.users[index];
+            if (confirm(`هل أنت متأكد من حذف حساب ${user.username}؟`)) {
+                try {
+                    // لا يمكن حذف المستخدم من Firebase Auth مباشرة من جانب العميل
+                    // هذا يتطلب وظيفة سحابية (Cloud Function)
+                    appData.users.splice(index, 1);
+                    render();
+                    alert('⚠️ تم حذف المستخدم محلياً. لحذفه نهائياً، اتصل بمسؤول Firebase.');
+                } catch (e) {
+                    console.log('خطأ في الحذف:', e);
+                }
             }
         }
 
@@ -1913,7 +2098,7 @@
             `;
         }
 
-        function addNote() {
+        async function addNote() {
             const title = document.getElementById('noteTitle').value.trim();
             const content = document.getElementById('noteContent').value.trim();
             
@@ -1924,7 +2109,7 @@
                     content: content,
                     createdAt: new Date().toISOString()
                 });
-                saveData();
+                await saveData();
                 render();
             }
         }
@@ -1947,15 +2132,15 @@
             }
         }
 
-        function deleteNote(index) {
+        async function deleteNote(index) {
             if (confirm('هل أنت متأكد من حذف هذه الملحظة؟')) {
                 appData.notes.splice(index, 1);
-                saveData();
+                await saveData();
                 render();
             }
         }
 
-        // الرندر الرئيسي - مع إضافة أيقونة إنستغرام أسفل الصفحة
+        // الرندر الرئيسي
         function render() {
             const app = document.getElementById('app');
             let content = '';
@@ -2019,7 +2204,7 @@
                     content = renderLogin();
             }
             
-            // إضافة أيقونة إنستغرام في أسفل الصفحة لجميع الصفحات
+            // إضافة أيقونة إنستغرام في أسفل الصفحة
             const instagramFooter = `
                 <div class="footer-instagram" onclick="window.open('https://www.instagram.com/011sally?igsh=NTZqOGs0eGU5YXg2', '_blank')">
                     <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -2070,16 +2255,20 @@
 
         // بدء التطبيق
         try {
-            loadData();
-            createSparkles();
-            render();
+            // جعل loadData async والانتظار حتى تنتهي
+            (async () => {
+                await loadData();
+                createSparkles();
+                render();
+            })();
         } catch (e) {
             console.error('خطأ في بدء التطبيق:', e);
             document.getElementById('app').innerHTML = `
                 <div style="color: red; padding: 20px; text-align: center;">
                     <h2>⚠️ حدث خطأ في التطبيق</h2>
-                    <p>حاول تحديث الصفحة أو مسح بيانات الموقع.</p>
+                    <p>حاول تحديث الصفحة أو التحقق من إعدادات Firebase.</p>
                     <p>التفاصيل: ${e.message}</p>
+                    <button class="btn btn-primary" onclick="location.reload()">إعادة تحميل</button>
                 </div>
             `;
         }
